@@ -1,3 +1,46 @@
 <resources>
-    <string name="app_name">ESAME MOBILE</string>
+    <string name="app_name">PantryMatch</string>
+
+    <!-- Navigation -->
+    <string name="nav_pantry">Dispensa</string>
+    <string name="nav_search">Cerca</string>
+    <string name="nav_friends">Amici</string>
+    <string name="nav_profile">Profilo</string>
+    <string name="nav_recipe">Ricetta</string>
+
+    <!-- Pantry -->
+    <string name="pantry_empty">La tua dispensa è vuota.\nAggiungi gli ingredienti che hai.</string>
+    <string name="pantry_add">Aggiungi ingrediente</string>
+    <string name="ingredient_name">Ingrediente</string>
+    <string name="ingredient_quantity">Quantità</string>
+    <string name="ingredient_unit">Unità</string>
+    <string name="delete">Elimina</string>
+
+    <!-- Search -->
+    <string name="search_filter_missing">Ingredienti mancanti ammessi</string>
+    <string name="search_ready_only">Preparabili</string>
+    <string name="search_max_1">Max 1</string>
+    <string name="search_max_2">Max 2</string>
+    <string name="search_friends_only">Solo amici</string>
+    <string name="search_action">Cosa posso cucinare?</string>
+    <string name="search_empty">Nessuna ricetta trovata.\nProva ad alzare il numero di ingredienti mancanti.</string>
+    <string name="badge_ready">Preparabile</string>
+    <string name="prep_time_format">%1$d min</string>
+    <plurals name="badge_missing">
+        <item quantity="one">Manca %d ingrediente</item>
+        <item quantity="other">Mancano %d ingredienti</item>
+    </plurals>
+
+    <!-- Recipe -->
+    <string name="ingredients">Ingredienti</string>
+    <string name="steps">Preparazione</string>
+    <string name="recipe_image">Immagine ricetta</string>
+
+    <!-- Friends / Profile / Auth -->
+    <string name="friends_placeholder">Sezione amici in arrivo.</string>
+    <string name="profile">Profilo</string>
+    <string name="logout">Esci</string>
+    <string name="login">Accedi</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 </resources>
