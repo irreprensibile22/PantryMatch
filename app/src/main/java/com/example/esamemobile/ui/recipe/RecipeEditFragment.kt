@@ -86,7 +86,7 @@ class RecipeEditFragment : Fragment() {
         editing = recipe
         binding.editTitle.setText(recipe.title)
         binding.editDescription.setText(recipe.description)
-        binding.editCategory.setText(recipe.category)
+        binding.editCategory.setText(recipe.category, false)
         binding.editPrepTime.setText(if (recipe.prepTimeMin > 0) recipe.prepTimeMin.toString() else "")
         binding.editIngredients.setText(RecipeFormParser.ingredientsToText(recipe.ingredients))
         binding.editSteps.setText(RecipeFormParser.stepsToText(recipe.steps))

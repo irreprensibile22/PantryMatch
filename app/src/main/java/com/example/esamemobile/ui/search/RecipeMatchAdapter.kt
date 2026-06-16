@@ -1,5 +1,6 @@
 package com.example.esamemobile.ui.search
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -10,15 +11,31 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.RecipeMatch
 import com.example.esamemobile.databinding.ItemRecipeMatchBinding
 
+/**
+ * Feed a schede verticali (stile Instagram): foto a tutta larghezza, avatar
+ * dell'autore e cuore "salva nei preferiti" in overlay sulla foto per il
+ * salvataggio rapido senza aprire il dettaglio.
+ */
 class RecipeMatchAdapter(
     private val onClick: (RecipeMatch) -> Unit,
+    private val onToggleFavorite: (RecipeMatch, Boolean) -> Unit = { _, _ -> },
 ) : ListAdapter<RecipeMatch, RecipeMatchAdapter.VH>(DIFF) {
+
+    /** Id delle ricette nei preferiti: determina cuore pieno/vuoto. */
+    var favoriteIds: Set<String> = emptySet()
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     inner class VH(val binding: ItemRecipeMatchBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(match: RecipeMatch) {
             val ctx = binding.root.context
             binding.textTitle.text = match.recipe.title
-            binding.textAuthor.text = match.recipe.authorName
+            binding.textAuthor.text = ctx.getString(R.string.by_author, match.recipe.authorName)
+            binding.textAvatar.text =
+                match.recipe.authorName.trim().firstOrNull()?.uppercase() ?: "?"
             binding.textTime.text = ctx.getString(R.string.prep_time_format, match.recipe.prepTimeMin)
 
             if (match.isReady) {
@@ -30,6 +47,15 @@ class RecipeMatchAdapter(
                 )
                 binding.textBadge.setBackgroundResource(R.drawable.bg_badge_missing)
             }
+
+            val isFav = favoriteIds.contains(match.recipe.id)
+            binding.buttonFavorite.setImageResource(
+                if (isFav) R.drawable.ic_favorite else R.drawable.ic_favorite_border
+            )
+            binding.buttonFavorite.contentDescription = ctx.getString(
+                if (isFav) R.string.detail_favorite_remove else R.string.detail_favorite_add
+            )
+            binding.buttonFavorite.setOnClickListener { onToggleFavorite(match, !isFav) }
 
             Glide.with(ctx)
                 .load(match.recipe.imageUrl)

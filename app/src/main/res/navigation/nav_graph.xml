@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/pantryFragment">
+    app:startDestination="@id/searchFragment">
 
     <fragment
         android:id="@+id/pantryFragment"
@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.esamemobile.ui.search.SearchFragment"
-        android:label="@string/nav_search"
+        android:label="@string/nav_home"
         tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_search_to_detail"
@@ -25,7 +25,28 @@
         android:id="@+id/friendsFragment"
         android:name="com.example.esamemobile.ui.friends.FriendsFragment"
         android:label="@string/nav_friends"
-        tools:layout="@layout/fragment_friends" />
+        tools:layout="@layout/fragment_friends">
+        <action
+            android:id="@+id/action_friends_to_friend_recipes"
+            app:destination="@id/friendRecipesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/friendRecipesFragment"
+        android:name="com.example.esamemobile.ui.friends.FriendRecipesFragment"
+        android:label="@string/nav_friend_recipes"
+        tools:layout="@layout/fragment_friend_recipes">
+        <argument
+            android:name="authorId"
+            app:argType="string" />
+        <argument
+            android:name="authorName"
+            app:argType="string"
+            android:defaultValue="" />
+        <action
+            android:id="@+id/action_friend_recipes_to_detail"
+            app:destination="@id/recipeDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
@@ -43,6 +64,19 @@
         <action
             android:id="@+id/action_profile_to_edit"
             app:destination="@id/recipeEditFragment" />
+        <action
+            android:id="@+id/action_profile_to_recipes_grid"
+            app:destination="@id/recipesGridFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipesGridFragment"
+        android:name="com.example.esamemobile.ui.profile.RecipesGridFragment"
+        android:label="@string/profile_my_recipes"
+        tools:layout="@layout/fragment_recipes_grid">
+        <action
+            android:id="@+id/action_recipes_grid_to_detail"
+            app:destination="@id/recipeDetailFragment" />
     </fragment>
 
     <fragment
@@ -76,7 +110,7 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_login_to_pantry"
-            app:destination="@id/pantryFragment"
+            app:destination="@id/searchFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
         <action
@@ -91,7 +125,7 @@
         tools:layout="@layout/fragment_register">
         <action
             android:id="@+id/action_register_to_pantry"
-            app:destination="@id/pantryFragment"
+            app:destination="@id/searchFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
     </fragment>

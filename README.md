@@ -26,14 +26,14 @@ app/src/main/java/com/example/esamemobile/
  ├─ MainActivity.kt              # single-activity: Toolbar + BottomNav + NavHost + sessione
  ├─ data/
  │   ├─ model/                   # Recipe, RecipeIngredient, PantryItem, UserProfile, RecipeMatch, Friend
- │   └─ repository/              # Auth, Pantry, Recipe (+Storage), Friends
+ │   └─ repository/              # Auth, Pantry, Recipe (+Storage), Friends, Favorites
  ├─ ui/
  │   ├─ auth/                    # Login (+Google), Register, AuthViewModel
  │   ├─ pantry/                  # Dispensa: Fragment, ViewModel, Adapter
- │   ├─ search/                  # Ricerca per ingredienti: Fragment, ViewModel, Adapter
+ │   ├─ search/                  # Home/Feed community + dialog Filtri (Disponibilità/Categoria)
  │   ├─ recipe/                  # Dettaglio + Crea/Modifica: Fragment, ViewModel
- │   ├─ friends/                 # Amici: ricerca/aggiunta, Fragment, ViewModel, Adapter
- │   └─ profile/                 # Profilo + le mie ricette + logout
+ │   ├─ friends/                 # Amici + ricette dell'amico (FriendRecipes): Fragment, ViewModel, Adapter
+ │   └─ profile/                 # Profilo + le mie ricette + Preferiti + logout
  ├─ work/                        # Background: PantryMatchWorker + Scheduler (WorkManager)
  └─ util/
      ├─ IngredientMatcher.kt     # cuore: matching dispensa ↔ ricette
@@ -106,7 +106,13 @@ Gli indici compositi necessari sono già definiti in
   `getMyRecipes()` per "Le mie ricette" ordinate per data;
 - `recipes`: **`isPublic` (ASC) + `ingredientNames` (array-contains)** — usato da
   `searchByPantry()` (`whereEqualTo("isPublic", true)` +
-  `whereArrayContainsAny("ingredientNames", …)`).
+  `whereArrayContainsAny("ingredientNames", …)`). Nota: la Home non usa più
+  `searchByPantry()` (il filtro mancanti è applicato lato client da
+  `IngredientMatcher`); l'indice resta per il metodo, tuttora disponibile in repo.
+
+> Il **feed della Home** (`getFeed`) e le **ricette dell'amico**
+> (`getPublicRecipesByAuthor`, `authorId` + `isPublic`) usano solo filtri di
+> uguaglianza con ordinamento lato client: **non** richiedono indici compositi.
 
 Pubblicali con `firebase deploy --only firestore:indexes` (Firebase CLI) oppure,
 al primo avvio, segui il link che Firestore stampa nel Logcat per crearli dalla
@@ -153,8 +159,8 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
   accesso sia da registrazione (al primo accesso crea il profilo Firestore); si
   nasconde se manca `default_web_client_id` (provider Google/SHA-1 non configurati).
 - ✅ **Step 3 — Sessione**: avvio sul login se non autenticato + logout→login.
-- ✅ **Step 4 — Amici**: `FriendsRepository`, ricerca per email, aggiungi/rimuovi,
-  filtro "Solo amici" nella ricerca ricette.
+- ✅ **Step 4 — Amici**: `FriendsRepository`, ricerca per email, aggiungi/rimuovi
+  (il filtro "Solo amici" della ricerca è poi stato sostituito, vedi *Migliorie*).
 - ✅ **Step 5 — Ricette CRUD + foto**: editor crea/modifica con immagine su
   **Storage**, "Le mie ricette" nel profilo.
 - ✅ **Step 6 — Dettaglio**: menu azioni in action bar — **preferiti**
@@ -173,6 +179,67 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
 
 ### Migliorie
 
+- ✅ **Tema arancione (Material 3)**: schema colore personalizzato incentrato
+  sull'arancione, con token completi *light* (`values/colors.xml`) e *dark*
+  (`values-night/colors.xml`) mappati sugli attributi M3 in `values/themes.xml`
+  (primary/secondary/tertiary, container, surface, outline…). Così FAB, pulsanti,
+  chip selezionati, indicatore della bottom bar, avatar e accenti diventano
+  arancioni in automatico; la **top bar** usa `colorPrimaryContainer` con titolo
+  centrato. Rimosso il `values-night/themes.xml` ridondante: la notte eredita lo
+  stesso tema con i colori scuri.
+- ✅ **Profilo — ricette orizzontali, ricerca testuale e "Vedi tutte"**: "Le mie
+  ricette" scorre ora **in orizzontale** (card a larghezza fissa, `RecipeAdapter`
+  con flag `horizontal`); ogni sezione ha un **pulsante di ricerca testuale** che
+  mostra un campo per filtrare per titolo (Le mie ricette **e** Preferiti, filtro
+  client-side). Il pulsante **"Vedi tutte"** apre `RecipesGridFragment`: una
+  **griglia** (`GridLayoutManager`, 2 colonne, `item_recipe_grid` +
+  `RecipeGridAdapter`) con tutte le proprie ricette e ricerca testuale dedicata
+  (`RecipesGridViewModel`).
+- ✅ **Amici — conteggio ricette + ricette dell'amico**: ogni card amico mostra
+  il **numero di ricette pubbliche** pubblicate (`@plurals/friend_recipe_count`);
+  toccando la card si apre `FriendRecipesFragment` con l'**elenco delle sue
+  ricette** (stesse schede grandi del feed, con preferiti). Conteggio e lista
+  usano `RecipeRepository.getPublicRecipesByAuthor()`; `FriendsViewModel` emette
+  `FriendItem(friend, recipeCount)` e la navigazione passa
+  `authorId`/`authorName` (titolo della action bar = nome amico).
+  La query vincola `authorId` **e** `isPublic == true` (entrambi server-side):
+  le Security Rules consentono di leggere le ricette altrui solo se pubbliche,
+  quindi senza il vincolo su `isPublic` Firestore rifiuterebbe l'intera query con
+  *permission denied* (sintomi: lista in errore e conteggio bloccato a 0). Due
+  filtri di sola uguaglianza non richiedono un indice composito.
+- ✅ **Home solo community + dialog Filtri per categorie**: la Home mostra sempre
+  le ricette della community (rimosso il selettore Community/Amici). Il pulsante
+  **Filtri** apre un dialog (`dialog_filters.xml`) **raggruppato in sezioni**:
+  *Disponibilità* (ingredienti mancanti: Tutte / Preparabili / Max 1 / Max 2) e
+  *Categoria* (chip generati da `@array/recipe_categories`: Antipasto, Primo,
+  Secondo, Contorno, Dolce, Bevanda), con *Applica* / *Reimposta*.
+  `SearchViewModel` tiene lo stato `maxMissing` + `category` (`setFilters()`,
+  filtro categoria client-side su `Recipe.category`). L'editor ricetta usa ora un
+  **menu a tendina** sulle stesse categorie (`MaterialAutoCompleteTextView` +
+  `app:simpleItems`) così le ricette restano filtrabili.
+- ✅ **Feed a schede grandi + salva rapido (regole Sezione 1)**: le card della Home
+  sono ora **verticali stile Instagram** — foto a tutta larghezza (240dp), nome
+  ricetta, **avatar autore** (cerchio con iniziale) e badge *Preparabile / N
+  mancanti* in overlay sulla foto. Il **cuore "salva nei preferiti"** è
+  direttamente sulla foto per il salvataggio rapido senza aprire il dettaglio
+  (`item_recipe_match.xml`, `RecipeMatchAdapter` con `favoriteIds` +
+  `onToggleFavorite`; `SearchViewModel.toggleFavorite()` con update ottimista e
+  `FavoritesRepository.getFavoriteIds()`).
+- ✅ **Profilo — sezione "Preferiti"**: sotto "Le mie ricette" un secondo elenco
+  mostra il **ricettario salvato dalla community** con le stesse schede grandi;
+  toccando il cuore si rimuove dai preferiti. Profilo reso scrollabile
+  (`NestedScrollView`) con due liste (`fragment_profile.xml`,
+  `ProfileViewModel.loadFavorites()/removeFavorite()`,
+  `RecipeRepository.getRecipesByIds()`).
+- ✅ **Home/Feed come schermata iniziale**: il tab **Cerca** è diventato la
+  **Home** dell'app (prima voce della bottom bar, icona casa, start destination
+  del nav graph; login/registrazione atterrano qui). All'apertura mostra un
+  **feed scrollabile** delle ricette pubbliche dalla più recente
+  (`RecipeRepository.getFeed()`, ordinamento lato client per non aggiungere
+  indici), annotate col match sulla dispensa così da conservare i badge
+  *Preparabile / N mancanti* (`IngredientMatcher.annotate()`, estratto da
+  `match()`). La selezione sorgente/filtri è poi confluita nel dialog **Filtri**
+  (vedi bullet sopra).
 - ✅ **Dispensa — modifica ingrediente**: ogni elemento ha due pulsanti affiancati
   **modifica** ed **elimina**; la modifica apre il dialog pre-compilato e il nome
   viene ri-normalizzato come in inserimento per restare coerente con il matcher

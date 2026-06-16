@@ -13,9 +13,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.esamemobile.R
 import com.example.esamemobile.data.model.RecipeMatch
+import com.example.esamemobile.databinding.DialogFiltersBinding
 import com.example.esamemobile.databinding.FragmentSearchBinding
 import com.example.esamemobile.ui.recipe.RecipeDetailFragment
 import com.example.esamemobile.util.Resource
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
@@ -25,7 +28,10 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SearchViewModel by viewModels()
-    private val adapter = RecipeMatchAdapter(onClick = { openDetail(it) })
+    private val adapter = RecipeMatchAdapter(
+        onClick = { openDetail(it) },
+        onToggleFavorite = { match, favorite -> viewModel.toggleFavorite(match, favorite) },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -37,18 +43,89 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerResults.adapter = adapter
 
-        binding.buttonSearch.setOnClickListener {
-            val maxMissing = when (binding.chipGroupMissing.checkedChipId) {
-                binding.chipMissing1.id -> 1
-                binding.chipMissing2.id -> 2
-                else -> 0
-            }
-            viewModel.search(maxMissing, friendsOnly = binding.chipFriendsOnly.isChecked)
-        }
+        binding.buttonFilters.setOnClickListener { showFilterDialog() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.results.collect { render(it) }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favoriteIds.collect { adapter.favoriteIds = it }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Riallinea i cuori se i preferiti sono cambiati altrove (es. dal dettaglio).
+        viewModel.loadFavorites()
+    }
+
+    /**
+     * Dialog "Filtri" raggruppato in sezioni: Disponibilità (ingredienti
+     * mancanti) e Categoria (Primo, Secondo, Dolce, …).
+     */
+    private fun showFilterDialog() {
+        val dialogBinding = DialogFiltersBinding.inflate(layoutInflater)
+
+        // Disponibilità: ripristina la selezione corrente.
+        dialogBinding.chipGroupAvailability.check(
+            when (viewModel.maxMissing) {
+                0 -> dialogBinding.chipAvailabilityReady.id
+                1 -> dialogBinding.chipAvailabilityMax1.id
+                2 -> dialogBinding.chipAvailabilityMax2.id
+                else -> dialogBinding.chipAvailabilityAll.id
+            }
+        )
+
+        // Categoria: chip "Tutte" + una per ogni categoria (caricate da risorse).
+        val categories = resources.getStringArray(R.array.recipe_categories)
+        addCategoryChip(dialogBinding, getString(R.string.filter_all), isAll = true)
+        categories.forEach { addCategoryChip(dialogBinding, it, isAll = false) }
+        checkCurrentCategory(dialogBinding)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.filter_title)
+            .setView(dialogBinding.root)
+            .setNeutralButton(R.string.filter_reset) { _, _ -> viewModel.setFilters(null, null) }
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.filter_apply) { _, _ ->
+                val maxMissing = when (dialogBinding.chipGroupAvailability.checkedChipId) {
+                    dialogBinding.chipAvailabilityReady.id -> 0
+                    dialogBinding.chipAvailabilityMax1.id -> 1
+                    dialogBinding.chipAvailabilityMax2.id -> 2
+                    else -> null
+                }
+                val checkedCategory = dialogBinding.root
+                    .findViewById<Chip>(dialogBinding.chipGroupCategory.checkedChipId)
+                val category = checkedCategory
+                    ?.takeIf { it.tag == CATEGORY_TAG }
+                    ?.text?.toString()
+                viewModel.setFilters(maxMissing, category)
+            }
+            .show()
+    }
+
+    private fun addCategoryChip(dialogBinding: DialogFiltersBinding, label: String, isAll: Boolean) {
+        val chip = Chip(requireContext()).apply {
+            text = label
+            isCheckable = true
+            if (isAll) isChecked = true else tag = CATEGORY_TAG
+        }
+        dialogBinding.chipGroupCategory.addView(chip)
+    }
+
+    private fun checkCurrentCategory(dialogBinding: DialogFiltersBinding) {
+        val current = viewModel.category ?: return
+        val group = dialogBinding.chipGroupCategory
+        for (i in 0 until group.childCount) {
+            val chip = group.getChildAt(i) as Chip
+            if (chip.tag == CATEGORY_TAG && chip.text.toString().equals(current, ignoreCase = true)) {
+                chip.isChecked = true
+                return
             }
         }
     }
@@ -77,5 +154,9 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
         binding.recyclerResults.adapter = null
         _binding = null
+    }
+
+    companion object {
+        private const val CATEGORY_TAG = "category"
     }
 }

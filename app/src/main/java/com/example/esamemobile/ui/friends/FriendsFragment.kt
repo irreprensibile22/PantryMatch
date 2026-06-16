@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Friend
 import com.example.esamemobile.data.model.UserProfile
 import com.example.esamemobile.databinding.FragmentFriendsBinding
@@ -27,7 +30,10 @@ class FriendsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: FriendsViewModel by viewModels()
-    private val friendsAdapter = FriendsAdapter(onRemove = { viewModel.removeFriend(it.uid) })
+    private val friendsAdapter = FriendsAdapter(
+        onClick = { openFriendRecipes(it) },
+        onRemove = { viewModel.removeFriend(it.uid) },
+    )
     private val searchAdapter = UserSearchAdapter(onAdd = { addFriend(it) })
 
     override fun onCreateView(
@@ -59,7 +65,17 @@ class FriendsFragment : Fragment() {
         viewModel.loadFriends()
     }
 
-    private fun renderFriends(state: Resource<List<Friend>>) {
+    private fun openFriendRecipes(friend: Friend) {
+        findNavController().navigate(
+            R.id.action_friends_to_friend_recipes,
+            bundleOf(
+                FriendRecipesFragment.ARG_AUTHOR_ID to friend.uid,
+                FriendRecipesFragment.ARG_AUTHOR_NAME to friend.displayName.ifBlank { friend.email },
+            ),
+        )
+    }
+
+    private fun renderFriends(state: Resource<List<FriendItem>>) {
         binding.progress.visibility = if (state is Resource.Loading) View.VISIBLE else View.GONE
         when (state) {
             is Resource.Loading -> Unit

@@ -28,12 +28,36 @@ class RecipeRepository {
     suspend fun getRecipe(id: String): Recipe? =
         recipes().document(id).get().await().toObject(Recipe::class.java)
 
+    /**
+     * Carica le ricette con gli [ids] indicati, **preservandone l'ordine** e
+     * scartando quelle non più esistenti. Usato per il ricettario dei preferiti.
+     */
+    suspend fun getRecipesByIds(ids: List<String>): List<Recipe> =
+        ids.mapNotNull { getRecipe(it) }
+
     suspend fun getMyRecipes(): List<Recipe> =
         recipes()
             .whereEqualTo("authorId", requireUid())
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .get().await()
             .toObjects(Recipe::class.java)
+
+    /**
+     * Ricette **pubbliche** di un autore, dalla più recente.
+     *
+     * Il filtro `isPublic == true` è **server-side** (non solo client): le
+     * Security Rules consentono a un altro utente di leggere una ricetta solo se
+     * pubblica, perciò una query che non vincola `isPublic` verrebbe rifiutata
+     * con *permission denied*. Due filtri di sola uguaglianza non richiedono un
+     * indice composito; l'ordinamento per data resta lato client.
+     */
+    suspend fun getPublicRecipesByAuthor(authorId: String): List<Recipe> =
+        recipes()
+            .whereEqualTo("authorId", authorId)
+            .whereEqualTo("isPublic", true)
+            .get().await()
+            .toObjects(Recipe::class.java)
+            .sortedByDescending { it.createdAt }
 
     suspend fun saveRecipe(recipe: Recipe): String {
         val withMeta = recipe.copy(
@@ -66,6 +90,27 @@ class RecipeRepository {
             .child("${System.currentTimeMillis()}.jpg")
         ref.putFile(localUri).await()
         return ref.downloadUrl.await().toString()
+    }
+
+    /**
+     * Feed della Home: tutte le ricette pubbliche, ordinate dalla più recente.
+     *
+     * L'ordinamento per `createdAt` è applicato lato client per non richiedere
+     * un ulteriore indice composito `isPublic` + `createdAt` su Firestore.
+     *
+     * @param authorIds se non null, limita agli autori indicati (es. amici).
+     */
+    suspend fun getFeed(authorIds: List<String>? = null): List<Recipe> {
+        if (authorIds != null && authorIds.isEmpty()) return emptyList()
+        var recipes = recipes()
+            .whereEqualTo("isPublic", true)
+            .get().await()
+            .toObjects(Recipe::class.java)
+        if (authorIds != null) {
+            val allowed = authorIds.toHashSet()
+            recipes = recipes.filter { it.authorId in allowed }
+        }
+        return recipes.sortedByDescending { it.createdAt }
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.example.esamemobile.ui.profile
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -10,11 +11,16 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.databinding.ItemRecipeBinding
 
-/** Lista semplice di ricette (usata per "le mie ricette" nel profilo). */
+/**
+ * Lista di ricette per "Le mie ricette" nel profilo, con azioni rapide
+ * modifica/elimina. Con [horizontal] = true le card hanno larghezza fissa per lo
+ * scorrimento orizzontale.
+ */
 class RecipeAdapter(
     private val onClick: (Recipe) -> Unit,
     private val onEdit: (Recipe) -> Unit,
     private val onDelete: (Recipe) -> Unit,
+    private val horizontal: Boolean = false,
 ) : ListAdapter<Recipe, RecipeAdapter.VH>(DIFF) {
 
     inner class VH(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -37,6 +43,14 @@ class RecipeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        if (horizontal) {
+            val widthPx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 300f, parent.resources.displayMetrics
+            ).toInt()
+            binding.root.layoutParams = RecyclerView.LayoutParams(
+                widthPx, RecyclerView.LayoutParams.WRAP_CONTENT
+            )
+        }
         return VH(binding)
     }
 

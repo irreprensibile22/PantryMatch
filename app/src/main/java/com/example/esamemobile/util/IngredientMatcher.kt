@@ -48,22 +48,32 @@ object IngredientMatcher {
         pantry: List<PantryItem>,
         recipes: List<Recipe>,
         maxMissing: Int = 2,
-    ): List<RecipeMatch> {
-        val owned = pantry.map { normalize(it.name) }.toHashSet()
-
-        return recipes
-            .map { recipe ->
-                val missing = recipe.ingredients
-                    .filterNot { it.optional }
-                    .map { normalize(it.name) }
-                    .distinct()
-                    .filterNot { owned.contains(it) }
-                RecipeMatch(recipe, missing)
-            }
+    ): List<RecipeMatch> =
+        annotate(pantry, recipes)
             .filter { it.missingCount <= maxMissing }
             .sortedWith(
                 compareBy({ it.missingCount }, { it.recipe.prepTimeMin })
             )
+
+    /**
+     * Annota ogni ricetta con i suoi ingredienti mancanti rispetto a [pantry],
+     * **mantenendo l'ordine di [recipes]** e senza applicare filtri: usato dal
+     * feed della Home per mostrare tutte le ricette (con badge preparabile /
+     * mancanti) nell'ordine in cui arrivano (es. dalla più recente).
+     */
+    fun annotate(
+        pantry: List<PantryItem>,
+        recipes: List<Recipe>,
+    ): List<RecipeMatch> {
+        val owned = pantry.map { normalize(it.name) }.toHashSet()
+        return recipes.map { recipe ->
+            val missing = recipe.ingredients
+                .filterNot { it.optional }
+                .map { normalize(it.name) }
+                .distinct()
+                .filterNot { owned.contains(it) }
+            RecipeMatch(recipe, missing)
+        }
     }
 
     /**

@@ -2,4 +2,38 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Palette Material 3 — tema chiaro, incentrato sull'arancione -->
+    <color name="md_primary">#BD4B14</color>
+    <color name="md_on_primary">#FFFFFF</color>
+    <color name="md_primary_container">#FFDBCC</color>
+    <color name="md_on_primary_container">#380D00</color>
+    <color name="md_inverse_primary">#FFB68F</color>
+
+    <color name="md_secondary">#8C4A30</color>
+    <color name="md_on_secondary">#FFFFFF</color>
+    <color name="md_secondary_container">#FFDBCC</color>
+    <color name="md_on_secondary_container">#341100</color>
+
+    <color name="md_tertiary">#6D5C2E</color>
+    <color name="md_on_tertiary">#FFFFFF</color>
+    <color name="md_tertiary_container">#F8E0A1</color>
+    <color name="md_on_tertiary_container">#221B00</color>
+
+    <color name="md_error">#BA1A1A</color>
+    <color name="md_on_error">#FFFFFF</color>
+    <color name="md_error_container">#FFDAD6</color>
+    <color name="md_on_error_container">#410002</color>
+
+    <color name="md_background">#FFF8F6</color>
+    <color name="md_on_background">#211A17</color>
+    <color name="md_surface">#FFF8F6</color>
+    <color name="md_on_surface">#211A17</color>
+    <color name="md_surface_variant">#F4DED5</color>
+    <color name="md_on_surface_variant">#52443D</color>
+    <color name="md_inverse_surface">#362F2C</color>
+    <color name="md_inverse_on_surface">#FBEEE9</color>
+
+    <color name="md_outline">#84746B</color>
+    <color name="md_outline_variant">#D7C2B8</color>
 </resources>

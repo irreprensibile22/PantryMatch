@@ -2,11 +2,13 @@
     <string name="app_name">PantryMatch</string>
 
     <!-- Navigation -->
+    <string name="nav_home">Home</string>
     <string name="nav_pantry">Dispensa</string>
     <string name="nav_search">Cerca</string>
     <string name="nav_friends">Amici</string>
     <string name="nav_profile">Profilo</string>
     <string name="nav_recipe">Ricetta</string>
+    <string name="nav_friend_recipes">Ricette</string>
 
     <!-- Pantry -->
     <string name="pantry_empty">La tua dispensa è vuota.\nAggiungi gli ingredienti che hai.</string>
@@ -32,13 +34,28 @@
     </string-array>
 
     <!-- Search -->
-    <string name="search_filter_missing">Ingredienti mancanti ammessi</string>
     <string name="search_ready_only">Preparabili</string>
-    <string name="search_max_1">Max 1</string>
-    <string name="search_max_2">Max 2</string>
-    <string name="search_friends_only">Solo amici</string>
-    <string name="search_action">Cosa posso cucinare?</string>
-    <string name="search_empty">Nessuna ricetta trovata.\nProva ad alzare il numero di ingredienti mancanti.</string>
+    <string name="search_max_1">Max 1 mancante</string>
+    <string name="search_max_2">Max 2 mancanti</string>
+    <string name="search_empty">Nessuna ricetta trovata.\nProva a cambiare i filtri.</string>
+    <string name="feed_title">Ricette dalla community</string>
+    <string name="filters">Filtri</string>
+    <string name="filter_title">Filtra le ricette</string>
+    <string name="filter_availability">Disponibilità</string>
+    <string name="filter_category">Categoria</string>
+    <string name="filter_all">Tutte</string>
+    <string name="filter_apply">Applica</string>
+    <string name="filter_reset">Reimposta</string>
+
+    <!-- Categorie ricetta (usate sia nell'editor sia nei filtri) -->
+    <string-array name="recipe_categories">
+        <item>Antipasto</item>
+        <item>Primo</item>
+        <item>Secondo</item>
+        <item>Contorno</item>
+        <item>Dolce</item>
+        <item>Bevanda</item>
+    </string-array>
     <string name="badge_ready">Preparabile</string>
     <string name="prep_time_format">%1$d min</string>
     <plurals name="badge_missing">
@@ -71,6 +88,11 @@
     <string name="friends_empty">Non hai ancora amici.\nCercali per email e aggiungili.</string>
     <string name="friend_add">Aggiungi amico</string>
     <string name="friend_remove">Rimuovi amico</string>
+    <string name="friend_recipes_empty">Questo amico non ha ancora pubblicato ricette.</string>
+    <plurals name="friend_recipe_count">
+        <item quantity="one">%d ricetta pubblicata</item>
+        <item quantity="other">%d ricette pubblicate</item>
+    </plurals>
 
     <!-- Profile / Auth -->
     <string name="profile">Profilo</string>
@@ -120,6 +142,11 @@
     <string name="profile_guest">Ospite</string>
     <string name="profile_my_recipes">Le mie ricette</string>
     <string name="profile_no_recipes">Non hai ancora pubblicato ricette.</string>
+    <string name="profile_favorites">Preferiti</string>
+    <string name="profile_no_favorites">Nessuna ricetta salvata.\nTocca il cuore sulle ricette in Home.</string>
+    <string name="profile_see_all">Vedi tutte</string>
+    <string name="search_by_name">Cerca per nome</string>
+    <string name="search_no_results">Nessun risultato per la ricerca.</string>
     <string name="profile_add_recipe">Aggiungi ricetta</string>
 
     <!-- Notifiche / background (Step 7) -->

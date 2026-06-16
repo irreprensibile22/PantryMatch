@@ -2,6 +2,7 @@ package com.example.esamemobile.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -18,6 +19,13 @@ class FavoritesRepository {
 
     suspend fun isFavorite(recipeId: String): Boolean =
         favoritesCollection().document(recipeId).get().await().exists()
+
+    /** Id delle ricette salvate nei preferiti, dalla più recente. */
+    suspend fun getFavoriteIds(): List<String> =
+        favoritesCollection()
+            .orderBy("addedAt", Query.Direction.DESCENDING)
+            .get().await()
+            .documents.map { it.id }
 
     /** Aggiunge ([favorite] = true) o rimuove il preferito per [recipeId]. */
     suspend fun setFavorite(recipeId: String, favorite: Boolean) {
