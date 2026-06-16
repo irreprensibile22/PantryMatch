@@ -37,6 +37,15 @@ class PantryViewModel(
         }
     }
 
+    fun updateItem(item: PantryItem) {
+        if (item.name.isBlank()) return
+        viewModelScope.launch {
+            runCatching { repository.updateItem(item) }
+                .onSuccess { load() }
+                .onFailure { _items.value = Resource.Error(it.message ?: "Errore", it) }
+        }
+    }
+
     fun deleteItem(itemId: String) {
         viewModelScope.launch {
             runCatching { repository.deleteItem(itemId) }

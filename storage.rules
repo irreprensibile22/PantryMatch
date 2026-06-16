@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Security rules per Firebase Storage (immagini delle ricette).
+// Le immagini sono salvate in `recipe_images/{uid}/{file}.jpg`:
+//  - lettura: consentita a tutti gli utenti autenticati (servono per mostrare
+//    le ricette pubbliche della community tramite Glide);
+//  - scrittura: solo il proprietario della cartella `{uid}`, con vincoli su
+//    dimensione massima e tipo di file (solo immagini).
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024 &&
+             request.resource.contentType.matches('image/.*');
+    }
+
+    match /recipe_images/{uid}/{imageId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(uid) && isValidImage();
+      allow delete: if isOwner(uid);
+    }
+  }
+}

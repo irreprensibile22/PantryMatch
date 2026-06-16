@@ -9,6 +9,7 @@ import com.example.esamemobile.data.model.PantryItem
 import com.example.esamemobile.databinding.ItemPantryBinding
 
 class PantryAdapter(
+    private val onEdit: (PantryItem) -> Unit,
     private val onDelete: (PantryItem) -> Unit,
 ) : ListAdapter<PantryItem, PantryAdapter.VH>(DIFF) {
 
@@ -18,6 +19,7 @@ class PantryAdapter(
             val qty = listOfNotNull(item.quantity?.let { trimNumber(it) }, item.unit)
                 .joinToString(" ")
             binding.textQuantity.text = qty
+            binding.buttonEdit.setOnClickListener { onEdit(item) }
             binding.buttonDelete.setOnClickListener { onDelete(item) }
         }
 

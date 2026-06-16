@@ -23,19 +23,22 @@ La descrizione completa e la mappatura sulle specifiche d'esame sono in
 
 ```
 app/src/main/java/com/example/esamemobile/
- ├─ MainActivity.kt              # single-activity: Toolbar + BottomNav + NavHost
+ ├─ MainActivity.kt              # single-activity: Toolbar + BottomNav + NavHost + sessione
  ├─ data/
- │   ├─ model/                   # Recipe, RecipeIngredient, PantryItem, UserProfile, RecipeMatch
- │   └─ repository/              # AuthRepository, PantryRepository, RecipeRepository
+ │   ├─ model/                   # Recipe, RecipeIngredient, PantryItem, UserProfile, RecipeMatch, Friend
+ │   └─ repository/              # Auth, Pantry, Recipe (+Storage), Friends
  ├─ ui/
- │   ├─ auth/                    # LoginFragment + AuthViewModel
+ │   ├─ auth/                    # Login (+Google), Register, AuthViewModel
  │   ├─ pantry/                  # Dispensa: Fragment, ViewModel, Adapter
  │   ├─ search/                  # Ricerca per ingredienti: Fragment, ViewModel, Adapter
- │   ├─ recipe/                  # Dettaglio ricetta: Fragment + ViewModel
- │   ├─ friends/                 # Amici (scheletro)
- │   └─ profile/                 # Profilo + logout
+ │   ├─ recipe/                  # Dettaglio + Crea/Modifica: Fragment, ViewModel
+ │   ├─ friends/                 # Amici: ricerca/aggiunta, Fragment, ViewModel, Adapter
+ │   └─ profile/                 # Profilo + le mie ricette + logout
+ ├─ work/                        # Background: PantryMatchWorker + Scheduler (WorkManager)
  └─ util/
      ├─ IngredientMatcher.kt     # cuore: matching dispensa ↔ ricette
+     ├─ RecipeFormParser.kt      # parsing form ingredienti/passaggi ↔ testo
+     ├─ Notifications.kt         # canale e id delle notifiche locali
      └─ Resource.kt              # wrapper stato UI (Loading/Success/Error)
 
 app/src/test/java/.../IngredientMatcherTest.kt   # test unitari del matcher
@@ -65,32 +68,133 @@ Oppure apri la cartella in **Android Studio** e usa Run ▶.
 1. Crea un progetto su [Firebase Console](https://console.firebase.google.com/).
 2. Aggiungi un'app **Android** con package `com.example.esamemobile`.
 3. Scarica **`google-services.json`** e mettilo in **`app/google-services.json`**.
-4. Abilita il plugin Gradle, decommentando le righe segnalate:
-   - in **`build.gradle.kts`** (root): `alias(libs.plugins.google.services) apply false`
-   - in **`app/build.gradle.kts`**: `alias(libs.plugins.google.services)`
+4. Il plugin Gradle **google-services è già abilitato** (in `build.gradle.kts`
+   root e in `app/build.gradle.kts`). ⚠️ Senza `app/google-services.json` la
+   build fallisce: se devi avviare il progetto **senza** Firebase, ri-commenta
+   `alias(libs.plugins.google.services)` in `app/build.gradle.kts`.
 5. In Firebase Console abilita:
    - **Authentication** → metodi *Email/Password* e *Google*;
    - **Cloud Firestore** (modalità produzione);
    - **Storage**.
-6. Pubblica le **Security Rules** in [`firestore.rules`](firestore.rules).
+
+   > **Google Sign-In**: dopo aver abilitato il provider *Google*, aggiungi
+   > l'impronta **SHA-1** dell'app (Impostazioni progetto → la tua app Android →
+   > *Aggiungi impronta*) e **ri-scarica** `google-services.json` (ora con
+   > `oauth_client` popolato). La SHA-1 di debug si ottiene con:
+   > ```bash
+   > ./gradlew signingReport
+   > ```
+   > Il plugin genera la risorsa `default_web_client_id`: senza di essa il
+   > pulsante Google si nasconde da solo. Il login Google funge **sia da accesso
+   > sia da registrazione** (al primo accesso crea il profilo Firestore), quindi
+   > è presente un unico pulsante nella schermata di login.
+6. Pubblica le **Security Rules**:
+   - Firestore → [`firestore.rules`](firestore.rules);
+   - Storage → [`storage.rules`](storage.rules).
+7. Pubblica gli **indici compositi** di Firestore da
+   [`firestore.indexes.json`](firestore.indexes.json) (vedi sotto).
 
 > `app/google-services.json` è in `.gitignore`: ogni membro del gruppo lo scarica
 > dal proprio accesso alla console (oppure lo si condivide a parte).
 
 ### Indici Firestore
 
-La ricerca usa `whereArrayContainsAny("ingredientNames", …)` combinato con
-`whereEqualTo("isPublic", true)` (ed eventualmente `whereIn("authorId", …)`):
-al primo avvio Firestore segnalerà nel Logcat un link per creare l'indice
-composto necessario. In alternativa definiscilo in `firestore.indexes.json`.
+Gli indici compositi necessari sono già definiti in
+[`firestore.indexes.json`](firestore.indexes.json):
+
+- `recipes`: **`authorId` (ASC) + `createdAt` (DESC)** — usato da
+  `getMyRecipes()` per "Le mie ricette" ordinate per data;
+- `recipes`: **`isPublic` (ASC) + `ingredientNames` (array-contains)** — usato da
+  `searchByPantry()` (`whereEqualTo("isPublic", true)` +
+  `whereArrayContainsAny("ingredientNames", …)`).
+
+Pubblicali con `firebase deploy --only firestore:indexes` (Firebase CLI) oppure,
+al primo avvio, segui il link che Firestore stampa nel Logcat per crearli dalla
+Console.
+
+### Deploy con Firebase CLI
+
+Il file [`firebase.json`](firebase.json) collega rules e indici al deploy:
+
+In [`.firebaserc`](.firebaserc) sostituisci il placeholder
+`your-firebase-project-id` con l'ID reale del tuo progetto Firebase, poi:
+
+```bash
+firebase login
+firebase deploy --only firestore,storage
+```
+
+> Senza `.firebaserc` (o per usare un progetto diverso) puoi sempre passare
+> `--project <project-id>` ai comandi.
+
+`firebase deploy --only firestore` pubblica `firestore.rules` +
+`firestore.indexes.json`; `--only storage` pubblica `storage.rules`.
+
+> Lo Storage delle immagini (`recipe_images/{uid}/…`) è protetto da
+> [`storage.rules`](storage.rules): lettura per utenti autenticati, scrittura
+> solo nel proprio percorso e con vincoli su tipo (solo immagini) e dimensione
+> (< 5 MB).
+
+> **Piano Spark (senza Storage).** Da fine 2024 Firebase Storage richiede il
+> piano Blaze. Se lo Storage non è attivo, l'app resta utilizzabile: al
+> salvataggio di una ricetta l'upload della foto viene tentato a parte e, se
+> fallisce, la ricetta è salvata comunque **senza foto** (con avviso
+> `recipe_saved_no_photo`). Le foto si attivano passando a Blaze (free tier
+> ampio; consigliato impostare un budget alert).
 
 ---
 
-## Stato attuale (scheletro)
+## Stato attuale (sviluppo per step)
 
-✅ Architettura, build funzionante, navigazione, modelli, repository, matcher
-con test unitari (6/6 verdi).
+Costruzione incrementale, uno step alla volta (ogni step compila):
 
-🔜 Da completare: Google Sign-In nel `LoginFragment`, modulo amici
-(`FriendsRepository`), creazione/modifica ricette con foto (Storage),
-notifiche/WorkManager (funzionalità background ed extra).
+- ✅ **Step 1 — Registrazione** email/password (validazione formato email + conferma password).
+- ✅ **Step 2 — Google Sign-In**: unico pulsante nel login che funge sia da
+  accesso sia da registrazione (al primo accesso crea il profilo Firestore); si
+  nasconde se manca `default_web_client_id` (provider Google/SHA-1 non configurati).
+- ✅ **Step 3 — Sessione**: avvio sul login se non autenticato + logout→login.
+- ✅ **Step 4 — Amici**: `FriendsRepository`, ricerca per email, aggiungi/rimuovi,
+  filtro "Solo amici" nella ricerca ricette.
+- ✅ **Step 5 — Ricette CRUD + foto**: editor crea/modifica con immagine su
+  **Storage**, "Le mie ricette" nel profilo.
+- ✅ **Step 6 — Dettaglio**: menu azioni in action bar — **preferiti**
+  (`FavoritesRepository`, sub-collection `users/{uid}/favorites`),
+  **condivisione** via intent `ACTION_SEND`, **azioni autore** modifica/elimina
+  (con conferma) visibili solo all'autore, **navigazione ricerca→dettaglio**.
+- ✅ **Step 7 — Background**: `PantryMatchWorker` (WorkManager, `CoroutineWorker`)
+  periodico ogni 12h che confronta la dispensa con le ricette pubbliche e mostra
+  una **notifica locale** "Con la tua dispensa puoi preparare N ricette"
+  (canale dedicato, permesso `POST_NOTIFICATIONS` richiesto a runtime su
+  Android 13+, scheduling unico via `PantryMatchScheduler`).
+- ✅ **Step 8 — Firebase**: `firestore.indexes.json` (indici compositi
+  `authorId`+`createdAt` e `isPublic`+`ingredientNames`) + `storage.rules`
+  (immagini ricette: lettura autenticata, scrittura solo owner con vincoli
+  tipo/dimensione).
+
+### Migliorie
+
+- ✅ **Dispensa — modifica ingrediente**: ogni elemento ha due pulsanti affiancati
+  **modifica** ed **elimina**; la modifica apre il dialog pre-compilato e il nome
+  viene ri-normalizzato come in inserimento per restare coerente con il matcher
+  (`PantryAdapter.onEdit` + `PantryViewModel.updateItem` + `PantryRepository.updateItem`).
+- ✅ **Dispensa — unità a tendina**: il campo *Unità* non è più a testo libero ma
+  un menu a tendina con le unità principali (`@array/pantry_units`: g, kg, ml, l,
+  pz, cucchiaino, cucchiaio, tazza, pizzico, q.b., oltre a "nessuna").
+- ✅ **Le mie ricette — azioni rapide**: ogni card nel profilo ha i pulsanti
+  **modifica** (apre l'editor con `recipeId`) ed **elimina** (con conferma)
+  oltre al tap sulla card che apre il dettaglio
+  (`RecipeAdapter.onEdit/onDelete` + `ProfileViewModel.deleteRecipe`).
+- ✅ **Storage opzionale (piano Spark)**: se l'upload immagine fallisce, la
+  ricetta è salvata comunque senza foto (avviso `recipe_saved_no_photo`).
+- 🐛 **Fix ricerca community/amici**: il boolean Kotlin `isPublic` veniva
+  serializzato da Firestore come campo `public` (convenzione JavaBean sui getter
+  `is…`), perciò `whereEqualTo("isPublic", true)` non trovava nulla. Risolto con
+  `@get:/@set:PropertyName("isPublic")` su `Recipe.isPublic` (coerente anche con
+  le Security Rules che leggono `isPublic`). Le ricette create prima vanno
+  ri-salvate per acquisire il campo corretto.
+
+Cuore funzionale (`IngredientMatcher`) coperto da test unitari (verdi).
+
+> Con il plugin `google-services` abilitato serve `app/google-services.json` per
+> compilare. Il pulsante Google resta nascosto finché non si configura il
+> provider (e si ri-scarica il `google-services.json` con l'`oauth_client`).

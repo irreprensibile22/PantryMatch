@@ -37,6 +37,12 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profile_to_detail"
+            app:destination="@id/recipeDetailFragment" />
+        <action
+            android:id="@+id/action_profile_to_edit"
+            app:destination="@id/recipeEditFragment" />
     </fragment>
 
     <fragment
@@ -47,6 +53,20 @@
         <argument
             android:name="recipeId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_detail_to_edit"
+            app:destination="@id/recipeEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeEditFragment"
+        android:name="com.example.esamemobile.ui.recipe.RecipeEditFragment"
+        android:label="@string/nav_recipe_edit"
+        tools:layout="@layout/fragment_recipe_edit">
+        <argument
+            android:name="recipeId"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
     <fragment
@@ -56,6 +76,21 @@
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_login_to_pantry"
+            app:destination="@id/pantryFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.esamemobile.ui.auth.RegisterFragment"
+        android:label="@string/register_title"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_register_to_pantry"
             app:destination="@id/pantryFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />

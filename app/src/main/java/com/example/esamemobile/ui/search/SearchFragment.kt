@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.example.esamemobile.R
 import com.example.esamemobile.data.model.RecipeMatch
 import com.example.esamemobile.databinding.FragmentSearchBinding
+import com.example.esamemobile.ui.recipe.RecipeDetailFragment
 import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -63,7 +67,10 @@ class SearchFragment : Fragment() {
     }
 
     private fun openDetail(match: RecipeMatch) {
-        // TODO: navigare al dettaglio passando match.recipe.id via Safe Args
+        findNavController().navigate(
+            R.id.action_search_to_detail,
+            bundleOf(RecipeDetailFragment.ARG_RECIPE_ID to match.recipe.id),
+        )
     }
 
     override fun onDestroyView() {

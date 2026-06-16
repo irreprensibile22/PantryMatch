@@ -3,6 +3,7 @@ package com.example.esamemobile.ui.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.esamemobile.data.model.RecipeMatch
+import com.example.esamemobile.data.repository.FriendsRepository
 import com.example.esamemobile.data.repository.PantryRepository
 import com.example.esamemobile.data.repository.RecipeRepository
 import com.example.esamemobile.util.Resource
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel(
     private val recipeRepository: RecipeRepository = RecipeRepository(),
     private val pantryRepository: PantryRepository = PantryRepository(),
+    private val friendsRepository: FriendsRepository = FriendsRepository(),
 ) : ViewModel() {
 
     private val _results = MutableStateFlow<Resource<List<RecipeMatch>>>(Resource.Success(emptyList()))
@@ -28,9 +30,8 @@ class SearchViewModel(
         viewModelScope.launch {
             _results.value = runCatching {
                 val pantry = pantryRepository.getPantry()
-                // NB: la lista amici verrà passata quando il modulo amici sarà
-                // collegato; per ora friendsOnly = ricerca su tutta la community.
-                recipeRepository.searchByPantry(pantry, maxMissing, authorIds = null)
+                val authorIds = if (friendsOnly) friendsRepository.getFriendIds() else null
+                recipeRepository.searchByPantry(pantry, maxMissing, authorIds)
             }.fold(
                 onSuccess = { Resource.Success(it) },
                 onFailure = { Resource.Error(it.message ?: "Errore nella ricerca", it) },

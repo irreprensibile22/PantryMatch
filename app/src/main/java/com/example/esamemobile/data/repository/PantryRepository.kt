@@ -32,7 +32,9 @@ class PantryRepository {
 
     suspend fun updateItem(item: PantryItem) {
         require(item.id.isNotEmpty()) { "Item senza id" }
-        collection().document(item.id).set(item).await()
+        // Normalizza il nome come in addItem, per coerenza col matcher
+        val normalized = item.copy(name = IngredientMatcher.normalize(item.name))
+        collection().document(item.id).set(normalized).await()
     }
 
     suspend fun deleteItem(itemId: String) {

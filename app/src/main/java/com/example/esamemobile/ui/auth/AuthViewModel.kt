@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.esamemobile.data.repository.AuthRepository
 import com.example.esamemobile.util.Resource
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,18 @@ class AuthViewModel(
                 .fold(
                     onSuccess = { Resource.Success(it) },
                     onFailure = { Resource.Error(it.message ?: "Login fallito", it) },
+                )
+        }
+    }
+
+    /** Login con credenziale Google ottenuta dal flusso Sign-In. */
+    fun loginWithGoogle(credential: AuthCredential) {
+        _state.value = Resource.Loading
+        viewModelScope.launch {
+            _state.value = runCatching { repository.loginWithCredential(credential) }
+                .fold(
+                    onSuccess = { Resource.Success(it) },
+                    onFailure = { Resource.Error(it.message ?: "Accesso con Google fallito", it) },
                 )
         }
     }

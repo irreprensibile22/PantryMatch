@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-    // Decommenta dopo aver aggiunto app/google-services.json (vedi README).
-    // alias(libs.plugins.google.services)
+    // Abilitato: app/google-services.json presente (vedi README, sezione Firebase).
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.glide)
+
+    // Background task (WorkManager)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Coroutine
     implementation(libs.kotlinx.coroutines.android)

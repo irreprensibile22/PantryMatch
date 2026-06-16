@@ -1,5 +1,6 @@
 package com.example.esamemobile.data.repository
 
+import android.net.Uri
 import com.example.esamemobile.data.model.PantryItem
 import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.data.model.RecipeMatch
@@ -7,6 +8,7 @@ import com.example.esamemobile.util.IngredientMatcher
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -19,6 +21,7 @@ import kotlinx.coroutines.tasks.await
 class RecipeRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
 
     private fun recipes() = db.collection(RECIPES)
 
@@ -35,6 +38,7 @@ class RecipeRepository {
     suspend fun saveRecipe(recipe: Recipe): String {
         val withMeta = recipe.copy(
             authorId = requireUid(),
+            authorName = auth.currentUser?.displayName.orEmpty(),
             ingredientNames = IngredientMatcher.ingredientNamesFor(recipe),
         )
         return if (withMeta.id.isEmpty()) {
@@ -52,6 +56,19 @@ class RecipeRepository {
     }
 
     /**
+     * Carica un'immagine di ricetta su Firebase Storage e restituisce l'URL di
+     * download pubblico, da salvare nel campo `imageUrl` della ricetta.
+     */
+    suspend fun uploadImage(localUri: Uri): String {
+        val ref = storage.reference
+            .child("recipe_images")
+            .child(requireUid())
+            .child("${System.currentTimeMillis()}.jpg")
+        ref.putFile(localUri).await()
+        return ref.downloadUrl.await().toString()
+    }
+
+    /**
      * Cerca le ricette pubbliche realizzabili con l'inventario [pantry],
      * ammettendo fino a [maxMissing] ingredienti mancanti.
      *
@@ -65,18 +82,20 @@ class RecipeRepository {
     ): List<RecipeMatch> {
         val owned = pantry.map { IngredientMatcher.normalize(it.name) }
         if (owned.isEmpty()) return emptyList()
+        if (authorIds != null && authorIds.isEmpty()) return emptyList()
 
-        // Firestore limita arrayContainsAny a 30 valori
-        var query: Query = recipes()
+        // Pre-filtro server-side sugli ingredienti (arrayContainsAny, max 30 valori).
+        // Il filtro per autore (amici) è applicato lato client: Firestore non
+        // permette di combinare arrayContainsAny e whereIn nella stessa query.
+        val query: Query = recipes()
             .whereEqualTo("isPublic", true)
             .whereArrayContainsAny("ingredientNames", owned.take(30))
 
+        var candidates = query.get().await().toObjects(Recipe::class.java)
         if (authorIds != null) {
-            if (authorIds.isEmpty()) return emptyList()
-            query = query.whereIn("authorId", authorIds.take(30))
+            val allowed = authorIds.toHashSet()
+            candidates = candidates.filter { it.authorId in allowed }
         }
-
-        val candidates = query.get().await().toObjects(Recipe::class.java)
         return IngredientMatcher.match(pantry, candidates, maxMissing)
     }
 

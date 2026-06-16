@@ -15,6 +15,21 @@
     <string name="ingredient_quantity">Quantità</string>
     <string name="ingredient_unit">Unità</string>
     <string name="delete">Elimina</string>
+    <string name="edit">Modifica</string>
+    <string name="unit_none">(nessuna)</string>
+    <string-array name="pantry_units">
+        <item>@string/unit_none</item>
+        <item>g</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>l</item>
+        <item>pz</item>
+        <item>cucchiaino</item>
+        <item>cucchiaio</item>
+        <item>tazza</item>
+        <item>pizzico</item>
+        <item>q.b.</item>
+    </string-array>
 
     <!-- Search -->
     <string name="search_filter_missing">Ingredienti mancanti ammessi</string>
@@ -36,11 +51,83 @@
     <string name="steps">Preparazione</string>
     <string name="recipe_image">Immagine ricetta</string>
 
-    <!-- Friends / Profile / Auth -->
-    <string name="friends_placeholder">Sezione amici in arrivo.</string>
+    <!-- Dettaglio ricetta: azioni -->
+    <string name="detail_favorite_add">Aggiungi ai preferiti</string>
+    <string name="detail_favorite_remove">Rimuovi dai preferiti</string>
+    <string name="detail_favorite_added">Aggiunta ai preferiti</string>
+    <string name="detail_favorite_removed">Rimossa dai preferiti</string>
+    <string name="detail_share">Condividi</string>
+    <string name="detail_edit">Modifica</string>
+    <string name="detail_delete">Elimina</string>
+    <string name="detail_delete_title">Eliminare la ricetta?</string>
+    <string name="detail_delete_message">L\'operazione è definitiva e non può essere annullata.</string>
+    <string name="detail_deleted">Ricetta eliminata.</string>
+    <string name="cancel">Annulla</string>
+    <string name="by_author">di %1$s</string>
+
+    <!-- Friends -->
+    <string name="friends_search_hint">Cerca un utente per email</string>
+    <string name="friends_my_friends">I tuoi amici</string>
+    <string name="friends_empty">Non hai ancora amici.\nCercali per email e aggiungili.</string>
+    <string name="friend_add">Aggiungi amico</string>
+    <string name="friend_remove">Rimuovi amico</string>
+
+    <!-- Profile / Auth -->
     <string name="profile">Profilo</string>
     <string name="logout">Esci</string>
     <string name="login">Accedi</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+
+    <!-- Registrazione -->
+    <string name="register_title">Crea account</string>
+    <string name="register_action">Registrati</string>
+    <string name="register_invalid">Compila tutti i campi (password di almeno 6 caratteri).</string>
+    <string name="register_email_invalid">Inserisci un\'email valida.</string>
+    <string name="register_password_mismatch">Le password non coincidono.</string>
+    <string name="display_name">Nome</string>
+    <string name="confirm_password">Conferma password</string>
+    <string name="go_to_register">Non hai un account? Registrati</string>
+
+    <!-- Google Sign-In -->
+    <string name="login_google">Accedi con Google</string>
+    <string name="login_google_error">Accesso con Google non riuscito.</string>
+
+    <!-- Editor ricetta -->
+    <string name="nav_recipe_edit">Nuova ricetta</string>
+    <string name="recipe_pick_image">Scegli foto</string>
+    <string name="recipe_title_hint">Titolo</string>
+    <string name="recipe_description_hint">Descrizione</string>
+    <string name="recipe_category_hint">Categoria</string>
+    <string name="recipe_prep_time_hint">Minuti</string>
+    <string name="recipe_difficulty">Difficoltà</string>
+    <string name="difficulty_easy">Facile</string>
+    <string name="difficulty_medium">Media</string>
+    <string name="difficulty_hard">Difficile</string>
+    <string name="recipe_ingredients_hint">Ingredienti</string>
+    <string name="recipe_ingredients_helper">Uno per riga, formato: nome : quantità unità (es. Farina : 200 g)</string>
+    <string name="recipe_steps_hint">Passaggi</string>
+    <string name="recipe_steps_helper">Un passaggio per riga</string>
+    <string name="recipe_public">Pubblica (visibile alla community)</string>
+    <string name="recipe_save">Salva ricetta</string>
+    <string name="recipe_invalid">Inserisci almeno il titolo e un ingrediente.</string>
+    <string name="recipe_saved">Ricetta salvata.</string>
+    <string name="recipe_saved_no_photo">Ricetta salvata senza foto: caricamento immagine non riuscito (Storage non disponibile).</string>
+    <string name="recipe_visibility_public">Pubblica</string>
+    <string name="recipe_visibility_private">Privata</string>
+
+    <!-- Profilo: le mie ricette -->
+    <string name="profile_guest">Ospite</string>
+    <string name="profile_my_recipes">Le mie ricette</string>
+    <string name="profile_no_recipes">Non hai ancora pubblicato ricette.</string>
+    <string name="profile_add_recipe">Aggiungi ricetta</string>
+
+    <!-- Notifiche / background (Step 7) -->
+    <string name="notif_channel_name">Suggerimenti dispensa</string>
+    <string name="notif_channel_desc">Notifica periodica sulle ricette che puoi preparare con la tua dispensa.</string>
+    <string name="notif_pantry_title">PantryMatch</string>
+    <plurals name="notif_pantry_text">
+        <item quantity="one">Con la tua dispensa puoi preparare %d ricetta!</item>
+        <item quantity="other">Con la tua dispensa puoi preparare %d ricette!</item>
+    </plurals>
 </resources>

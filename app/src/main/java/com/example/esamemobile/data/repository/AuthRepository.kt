@@ -4,6 +4,7 @@ import com.example.esamemobile.data.model.UserProfile
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -16,12 +17,18 @@ class AuthRepository {
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
 
     val currentUser: FirebaseUser? get() = auth.currentUser
+    val currentUid: String? get() = auth.currentUser?.uid
     val isLoggedIn: Boolean get() = auth.currentUser != null
 
     suspend fun register(email: String, password: String, displayName: String): FirebaseUser {
-        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
         val user = requireNotNull(result.user) { "Registrazione fallita" }
-        saveProfile(UserProfile(user.uid, displayName, email, user.photoUrl?.toString()))
+        // Aggiorna il displayName anche su FirebaseAuth (oltre al profilo Firestore)
+        user.updateProfile(
+            UserProfileChangeRequest.Builder().setDisplayName(displayName).build()
+        ).await()
+        // Email salvata normalizzata (lowercase) per la ricerca amici per email.
+        saveProfile(UserProfile(user.uid, displayName, email.trim().lowercase(), user.photoUrl?.toString()))
         return user
     }
 
@@ -38,7 +45,12 @@ class AuthRepository {
         val snapshot = db.collection(USERS).document(user.uid).get().await()
         if (!snapshot.exists()) {
             saveProfile(
-                UserProfile(user.uid, user.displayName ?: "", user.email ?: "", user.photoUrl?.toString())
+                UserProfile(
+                    user.uid,
+                    user.displayName ?: "",
+                    user.email?.lowercase() ?: "",
+                    user.photoUrl?.toString(),
+                )
             )
         }
         return user

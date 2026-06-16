@@ -1,6 +1,7 @@
 package com.example.esamemobile.data.model
 
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.PropertyName
 
 /**
  * Una ricetta pubblicata da un utente.
@@ -23,7 +24,11 @@ data class Recipe(
     val prepTimeMin: Int = 0,
     val difficulty: String = Difficulty.EASY.name,
     val category: String = "",
-    val isPublic: Boolean = true,
+    // Senza @PropertyName Firestore serializzerebbe il getter isPublic() come
+    // campo "public" (convenzione JavaBean sui boolean is-): così la query
+    // whereEqualTo("isPublic", true) non troverebbe nulla. Forziamo il nome.
+    @get:PropertyName("isPublic") @set:PropertyName("isPublic")
+    var isPublic: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
 )
 

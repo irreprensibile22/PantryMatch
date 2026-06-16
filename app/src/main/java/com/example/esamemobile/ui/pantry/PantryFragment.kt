@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.esamemobile.R
+import com.example.esamemobile.data.model.PantryItem
 import com.example.esamemobile.databinding.DialogAddIngredientBinding
 import com.example.esamemobile.databinding.FragmentPantryBinding
 import com.example.esamemobile.util.Resource
@@ -22,7 +25,10 @@ class PantryFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PantryViewModel by viewModels()
-    private val adapter = PantryAdapter(onDelete = { viewModel.deleteItem(it.id) })
+    private val adapter = PantryAdapter(
+        onEdit = { showItemDialog(it) },
+        onDelete = { viewModel.deleteItem(it.id) },
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -33,7 +39,7 @@ class PantryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerPantry.adapter = adapter
-        binding.fabAdd.setOnClickListener { showAddDialog() }
+        binding.fabAdd.setOnClickListener { showItemDialog() }
         binding.swipeRefresh.setOnRefreshListener { viewModel.load() }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -44,7 +50,7 @@ class PantryFragment : Fragment() {
         viewModel.load()
     }
 
-    private fun render(state: Resource<List<com.example.esamemobile.data.model.PantryItem>>) {
+    private fun render(state: Resource<List<PantryItem>>) {
         binding.swipeRefresh.isRefreshing = state is Resource.Loading
         when (state) {
             is Resource.Loading -> Unit
@@ -57,21 +63,50 @@ class PantryFragment : Fragment() {
         }
     }
 
-    private fun showAddDialog() {
+    /**
+     * Dialog condiviso per aggiungere un nuovo ingrediente ([existing] null) o
+     * modificarne uno esistente (campi pre-compilati).
+     */
+    private fun showItemDialog(existing: PantryItem? = null) {
         val dialogBinding = DialogAddIngredientBinding.inflate(layoutInflater)
+
+        // Unità: menu a tendina con valori predefiniti (non digitabile).
+        val noUnit = getString(R.string.unit_none)
+        dialogBinding.editUnit.setAdapter(
+            ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                resources.getStringArray(R.array.pantry_units),
+            )
+        )
+        // Selezione iniziale: unità esistente oppure "(nessuna)".
+        dialogBinding.editUnit.setText(existing?.unit?.takeIf { it.isNotBlank() } ?: noUnit, false)
+
+        existing?.let {
+            dialogBinding.editName.setText(it.name.replaceFirstChar { c -> c.uppercase() })
+            dialogBinding.editQuantity.setText(it.quantity?.let(::trimNumber).orEmpty())
+        }
+        val isEdit = existing != null
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Aggiungi ingrediente")
+            .setTitle(if (isEdit) "Modifica ingrediente" else "Aggiungi ingrediente")
             .setView(dialogBinding.root)
-            .setPositiveButton("Aggiungi") { _, _ ->
-                viewModel.addItem(
-                    name = dialogBinding.editName.text?.toString().orEmpty(),
-                    quantity = dialogBinding.editQuantity.text?.toString()?.toDoubleOrNull(),
-                    unit = dialogBinding.editUnit.text?.toString()?.takeIf { it.isNotBlank() },
-                )
+            .setPositiveButton(if (isEdit) "Salva" else "Aggiungi") { _, _ ->
+                val name = dialogBinding.editName.text?.toString().orEmpty()
+                val quantity = dialogBinding.editQuantity.text?.toString()?.toDoubleOrNull()
+                val unit = dialogBinding.editUnit.text?.toString()
+                    ?.takeIf { it.isNotBlank() && it != noUnit }
+                if (existing != null) {
+                    viewModel.updateItem(existing.copy(name = name, quantity = quantity, unit = unit))
+                } else {
+                    viewModel.addItem(name, quantity, unit)
+                }
             }
             .setNegativeButton("Annulla", null)
             .show()
     }
+
+    private fun trimNumber(value: Double): String =
+        if (value % 1.0 == 0.0) value.toInt().toString() else value.toString()
 
     override fun onDestroyView() {
         super.onDestroyView()
