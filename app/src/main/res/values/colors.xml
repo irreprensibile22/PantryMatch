@@ -3,11 +3,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Palette Material 3 — tema chiaro, incentrato sull'arancione -->
-    <color name="md_primary">#BD4B14</color>
+    <!-- Palette Material 3 — tema chiaro "Tavola" (caldo, crema/terracotta) -->
+    <color name="md_primary">#C8552B</color>
     <color name="md_on_primary">#FFFFFF</color>
-    <color name="md_primary_container">#FFDBCC</color>
-    <color name="md_on_primary_container">#380D00</color>
+    <color name="md_primary_container">#F7E4D4</color>
+    <color name="md_on_primary_container">#2C2420</color>
     <color name="md_inverse_primary">#FFB68F</color>
 
     <color name="md_secondary">#8C4A30</color>
@@ -25,15 +25,38 @@
     <color name="md_error_container">#FFDAD6</color>
     <color name="md_on_error_container">#410002</color>
 
-    <color name="md_background">#FFF8F6</color>
-    <color name="md_on_background">#211A17</color>
-    <color name="md_surface">#FFF8F6</color>
-    <color name="md_on_surface">#211A17</color>
-    <color name="md_surface_variant">#F4DED5</color>
-    <color name="md_on_surface_variant">#52443D</color>
+    <color name="md_background">#F4ECE0</color>
+    <color name="md_on_background">#2C2420</color>
+    <color name="md_surface">#FFFCF8</color>
+    <color name="md_on_surface">#2C2420</color>
+    <color name="md_surface_variant">#EBDFCF</color>
+    <color name="md_on_surface_variant">#6E5D4E</color>
     <color name="md_inverse_surface">#362F2C</color>
     <color name="md_inverse_on_surface">#FBEEE9</color>
 
-    <color name="md_outline">#84746B</color>
-    <color name="md_outline_variant">#D7C2B8</color>
+    <color name="md_outline">#9A8A7B</color>
+    <color name="md_outline_variant">#DDCBB9</color>
+
+    <!-- Palette "Tavola" — feed editoriale della Home (vedi Tavola_Home_A.html) -->
+    <color name="tavola_bg">#F4ECE0</color>
+    <color name="tavola_header">#F7E4D4</color>
+    <color name="tavola_accent">#C8552B</color>
+    <color name="tavola_ink">#2C2420</color>
+    <color name="tavola_muted">#90785F</color>
+    <color name="tavola_muted_dark">#5C4A3D</color>
+    <color name="tavola_card">#FFFCF8</color>
+    <color name="tavola_badge_ready">#5C6E3F</color>
+    <color name="tavola_badge_missing">#C2702F</color>
+    <color name="tavola_avatar">#B5532A</color>
+    <color name="tavola_nav">#FCF8F2</color>
+    <color name="tavola_nav_inactive">#9A8A7B</color>
+    <color name="tavola_pill_bg">#8CFFFFFF</color>
+    <color name="tavola_fav_scrim">#8CFFFFFF</color>
+    <color name="tavola_hairline">#0F2C2420</color>
+    <color name="tavola_tile">#FBEBD9</color>
+    <color name="tavola_danger">#B5532A</color>
+    <color name="tavola_danger_bg">#F9E9E2</color>
+    <color name="tavola_chip_bg">#FBEBE2</color>
+    <color name="tavola_icon_stroke">#7A6757</color>
+    <color name="tavola_label">#A8937F</color>
 </resources>

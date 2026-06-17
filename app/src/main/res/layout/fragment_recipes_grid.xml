@@ -4,36 +4,109 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:background="@color/tavola_bg"
+    android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
+    <!-- Header editoriale "Tavola" (sotto-schermata con freccia indietro) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:endIconMode="clear_text"
-        app:startIconDrawable="@drawable/ic_search"
-        android:hint="@string/search_by_name">
+        android:background="@color/tavola_header"
+        android:orientation="vertical"
+        android:paddingHorizontal="22dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="18dp">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <ImageView
+            android:id="@+id/buttonBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="-8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/cd_back"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/tavola_ink" />
+
+        <TextView
+            android:id="@+id/textHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="serif"
+            android:letterSpacing="-0.012"
+            android:textColor="@color/tavola_ink"
+            android:textSize="29sp"
+            android:textStyle="bold"
+            tools:text="Le mie ricette" />
+
+        <TextView
+            android:id="@+id/textHeaderSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/tavola_muted"
+            android:textSize="13.5sp"
+            tools:text="Le ricette che hai creato" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/tavola_hairline" />
+
+    <!-- ricerca testuale stile Tavola -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_search_box"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="22dp"
+        android:layout_marginTop="14dp"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="11dp">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_search"
+            app:tint="@color/tavola_label" />
+
+        <EditText
             android:id="@+id/editSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:hint="@string/search_by_name"
             android:imeOptions="actionSearch"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:minHeight="0dp"
+            android:paddingVertical="2dp"
+            android:textColor="@color/tavola_ink"
+            android:textColorHint="@color/tavola_label"
+            android:textSize="14.5sp" />
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_marginTop="14dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerGrid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="12dp"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="18dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="2"
             tools:listitem="@layout/item_recipe_grid" />
@@ -50,8 +123,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
             android:text="@string/profile_no_recipes"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="@color/tavola_muted"
+            android:textSize="15sp"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

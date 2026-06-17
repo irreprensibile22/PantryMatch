@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Friend
 import com.example.esamemobile.data.model.UserProfile
+import com.example.esamemobile.data.repository.AuthRepository
 import com.example.esamemobile.databinding.FragmentFriendsBinding
 import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
@@ -46,6 +47,9 @@ class FriendsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerFriends.adapter = friendsAdapter
         binding.recyclerSearch.adapter = searchAdapter
+
+        val name = runCatching { AuthRepository().currentUser?.displayName }.getOrNull()
+        binding.textProfileInitial.text = name?.trim()?.firstOrNull()?.uppercase() ?: "?"
 
         binding.editSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -82,6 +86,7 @@ class FriendsFragment : Fragment() {
             is Resource.Success -> {
                 friendsAdapter.submitList(state.data)
                 binding.textEmpty.visibility = if (state.data.isEmpty()) View.VISIBLE else View.GONE
+                binding.textFriendsLabel.text = getString(R.string.friends_label, state.data.size)
             }
             is Resource.Error ->
                 Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()

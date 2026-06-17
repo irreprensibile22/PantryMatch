@@ -3,6 +3,7 @@ package com.example.esamemobile.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.esamemobile.data.model.Recipe
+import com.example.esamemobile.data.repository.FavoritesRepository
 import com.example.esamemobile.data.repository.RecipeRepository
 import com.example.esamemobile.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,10 +11,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/** Tutte le ricette dell'utente in griglia, con ricerca testuale per titolo. */
+/**
+ * Griglia "Vedi tutte" con ricerca testuale. A seconda di [Mode] mostra le ricette
+ * pubblicate dall'utente oppure quelle salvate nei preferiti.
+ */
 class RecipesGridViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
+    private val favoritesRepository: FavoritesRepository = FavoritesRepository(),
 ) : ViewModel() {
+
+    enum class Mode { MINE, SAVED }
 
     private val _recipes = MutableStateFlow<Resource<List<Recipe>>>(Resource.Loading)
     val recipes: StateFlow<Resource<List<Recipe>>> = _recipes.asStateFlow()
@@ -21,10 +28,15 @@ class RecipesGridViewModel(
     private var all: List<Recipe> = emptyList()
     private var query: String = ""
 
-    fun load() {
+    fun load(mode: Mode) {
         _recipes.value = Resource.Loading
         viewModelScope.launch {
-            runCatching { repository.getMyRecipes() }
+            runCatching {
+                when (mode) {
+                    Mode.MINE -> repository.getMyRecipes()
+                    Mode.SAVED -> repository.getRecipesByIds(favoritesRepository.getFavoriteIds())
+                }
+            }
                 .onSuccess {
                     all = it
                     emitFiltered()

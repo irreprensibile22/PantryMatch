@@ -6,13 +6,21 @@
     <string name="nav_pantry">Dispensa</string>
     <string name="nav_search">Cerca</string>
     <string name="nav_friends">Amici</string>
+    <string name="nav_recipe_book">Ricettario</string>
     <string name="nav_profile">Profilo</string>
     <string name="nav_recipe">Ricetta</string>
     <string name="nav_friend_recipes">Ricette</string>
+    <string name="cd_back">Indietro</string>
+    <string name="friend_recipes_subtitle">Le ricette pubblicate</string>
 
     <!-- Pantry -->
+    <string name="pantry_title">La tua dispensa</string>
     <string name="pantry_empty">La tua dispensa è vuota.\nAggiungi gli ingredienti che hai.</string>
     <string name="pantry_add">Aggiungi ingrediente</string>
+    <plurals name="pantry_count">
+        <item quantity="one">%d ingrediente disponibile</item>
+        <item quantity="other">%d ingredienti disponibili</item>
+    </plurals>
     <string name="ingredient_name">Ingrediente</string>
     <string name="ingredient_quantity">Quantità</string>
     <string name="ingredient_unit">Unità</string>
@@ -38,7 +46,7 @@
     <string name="search_max_1">Max 1 mancante</string>
     <string name="search_max_2">Max 2 mancanti</string>
     <string name="search_empty">Nessuna ricetta trovata.\nProva a cambiare i filtri.</string>
-    <string name="feed_title">Ricette dalla community</string>
+    <string name="feed_title">Ricette dalla\ncommunity</string>
     <string name="filters">Filtri</string>
     <string name="filter_title">Filtra le ricette</string>
     <string name="filter_availability">Disponibilità</string>
@@ -85,6 +93,8 @@
     <!-- Friends -->
     <string name="friends_search_hint">Cerca un utente per email</string>
     <string name="friends_my_friends">I tuoi amici</string>
+    <string name="friends_subtitle">Scopri le ricette di chi cucina con te</string>
+    <string name="friends_label">Amici · %1$d</string>
     <string name="friends_empty">Non hai ancora amici.\nCercali per email e aggiungili.</string>
     <string name="friend_add">Aggiungi amico</string>
     <string name="friend_remove">Rimuovi amico</string>
@@ -100,6 +110,45 @@
     <string name="login">Accedi</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+
+    <!-- Ricettario -->
+    <string name="recipe_book_title">Il tuo ricettario</string>
+    <string name="recipe_book_tab_mine">Le mie ricette</string>
+    <string name="recipe_book_tab_saved">Salvati</string>
+    <string name="recipe_book_subtitle_mine">Le ricette che hai creato</string>
+    <string name="recipe_book_subtitle_saved">Salvate dagli amici</string>
+    <plurals name="ingredients_count">
+        <item quantity="one">%d ingrediente</item>
+        <item quantity="other">%d ingredienti</item>
+    </plurals>
+
+    <!-- Profilo: gestione account -->
+    <string name="profile_account">Account</string>
+    <string name="profile_preferences">Preferenze</string>
+    <string name="profile_notifications">Notifiche</string>
+    <string name="profile_stat_recipes">Ricette</string>
+    <string name="profile_stat_saved">Salvate</string>
+    <string name="profile_stat_friends">Amici</string>
+    <string name="profile_version">Tavola · versione 1.0</string>
+    <string name="profile_edit_name">Modifica nome</string>
+    <string name="profile_change_email">Cambia email</string>
+    <string name="profile_change_password">Cambia password</string>
+    <string name="profile_reset_password">Reimposta password via email</string>
+    <string name="action_save">Salva</string>
+    <string name="action_send">Invia</string>
+    <string name="current_password">Password attuale</string>
+    <string name="new_password">Nuova password</string>
+    <string name="new_password_confirm">Conferma nuova password</string>
+    <string name="new_email">Nuova email</string>
+    <string name="field_required">Campo obbligatorio.</string>
+    <string name="password_min_length">La password deve avere almeno 6 caratteri.</string>
+    <string name="profile_name_updated">Nome aggiornato.</string>
+    <string name="profile_password_updated">Password aggiornata.</string>
+    <string name="profile_email_verification_sent">Ti abbiamo inviato un\'email di verifica al nuovo indirizzo: conferma dal link per completare il cambio. Dopo la conferma dovrai accedere di nuovo.</string>
+    <string name="session_revoked_relogin">Email aggiornata. Accedi di nuovo con la nuova email.</string>
+    <string name="profile_reset_password_message">Invieremo un\'email per reimpostare la password a %1$s.</string>
+    <string name="profile_reset_password_sent">Email di reimpostazione inviata a %1$s.</string>
+    <string name="profile_email_updated">Email aggiornata.</string>
 
     <!-- Registrazione -->
     <string name="register_title">Crea account</string>

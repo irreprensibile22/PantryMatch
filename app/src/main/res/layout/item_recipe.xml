@@ -5,72 +5,118 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp">
+    android:layout_marginBottom="18dp"
+    app:cardBackgroundColor="@color/tavola_card"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="3dp"
+    app:strokeColor="@color/tavola_hairline"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/imageRecipe"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="12dp"
-            android:background="?attr/colorSurfaceVariant"
-            android:contentDescription="@string/recipe_image"
-            android:scaleType="centerCrop" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageRecipe"
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                android:background="#EBDFCF"
+                android:contentDescription="@string/recipe_image"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/textBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="13dp"
+                android:paddingHorizontal="11dp"
+                android:paddingVertical="5dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:background="@drawable/bg_status_public"
+                tools:text="Pubblica"
+                tools:textColor="#5C6E3F" />
+        </FrameLayout>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="13dp"
+            android:paddingBottom="14dp">
 
             <TextView
                 android:id="@+id/textTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                tools:text="Pancake" />
+                android:fontFamily="serif"
+                android:letterSpacing="-0.005"
+                android:maxLines="2"
+                android:textColor="@color/tavola_ink"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                tools:text="Crema pasticcera della nonna" />
 
-            <TextView
-                android:id="@+id/textSubtitle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                tools:text="15 min" />
+                android:layout_marginTop="9dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textVisibility"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                tools:text="Pubblica" />
+                <TextView
+                    android:id="@+id/textTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/tavola_muted"
+                    android:textSize="12.5sp"
+                    app:drawableStartCompat="@drawable/ic_clock"
+                    tools:text="20 min" />
+
+                <TextView
+                    android:id="@+id/textIngredients"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/tavola_muted"
+                    android:textSize="12.5sp"
+                    tools:text="· 6 ingredienti" />
+
+                <ImageButton
+                    android:id="@+id/buttonEdit"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_circle_neutral"
+                    android:contentDescription="@string/edit"
+                    android:padding="9dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/tavola_icon_stroke" />
+
+                <ImageButton
+                    android:id="@+id/buttonDelete"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_circle_danger"
+                    android:contentDescription="@string/delete"
+                    android:padding="9dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_delete"
+                    app:tint="@color/tavola_danger" />
+            </LinearLayout>
         </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/buttonEdit"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/edit"
-            android:src="@android:drawable/ic_menu_edit" />
-
-        <ImageButton
-            android:id="@+id/buttonDelete"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/delete"
-            android:src="@android:drawable/ic_menu_delete" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

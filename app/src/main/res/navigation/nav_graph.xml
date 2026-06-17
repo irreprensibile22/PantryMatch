@@ -58,14 +58,21 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeBookFragment"
+        android:name="com.example.esamemobile.ui.recipebook.RecipeBookFragment"
+        android:label="@string/nav_recipe_book"
+        tools:layout="@layout/fragment_recipebook">
         <action
-            android:id="@+id/action_profile_to_detail"
+            android:id="@+id/action_recipebook_to_detail"
             app:destination="@id/recipeDetailFragment" />
         <action
-            android:id="@+id/action_profile_to_edit"
+            android:id="@+id/action_recipebook_to_edit"
             app:destination="@id/recipeEditFragment" />
         <action
-            android:id="@+id/action_profile_to_recipes_grid"
+            android:id="@+id/action_recipebook_to_recipes_grid"
             app:destination="@id/recipesGridFragment" />
     </fragment>
 
@@ -74,6 +81,10 @@
         android:name="com.example.esamemobile.ui.profile.RecipesGridFragment"
         android:label="@string/profile_my_recipes"
         tools:layout="@layout/fragment_recipes_grid">
+        <argument
+            android:name="mode"
+            app:argType="string"
+            android:defaultValue="mine" />
         <action
             android:id="@+id/action_recipes_grid_to_detail"
             app:destination="@id/recipeDetailFragment" />

@@ -1,6 +1,6 @@
 package com.example.esamemobile.ui.profile
 
-import android.util.TypedValue
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -12,25 +12,35 @@ import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.databinding.ItemRecipeBinding
 
 /**
- * Lista di ricette per "Le mie ricette" nel profilo, con azioni rapide
- * modifica/elimina. Con [horizontal] = true le card hanno larghezza fissa per lo
- * scorrimento orizzontale.
+ * "Le mie ricette" nel Ricettario: card a tutta larghezza in stile feed con foto,
+ * badge stato (Pubblica/Privata), tempo, numero ingredienti e azioni
+ * modifica/elimina.
  */
 class RecipeAdapter(
     private val onClick: (Recipe) -> Unit,
     private val onEdit: (Recipe) -> Unit,
     private val onDelete: (Recipe) -> Unit,
-    private val horizontal: Boolean = false,
 ) : ListAdapter<Recipe, RecipeAdapter.VH>(DIFF) {
 
     inner class VH(val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(recipe: Recipe) {
             val ctx = binding.root.context
             binding.textTitle.text = recipe.title
-            binding.textSubtitle.text = ctx.getString(R.string.prep_time_format, recipe.prepTimeMin)
-            binding.textVisibility.text = ctx.getString(
-                if (recipe.isPublic) R.string.recipe_visibility_public else R.string.recipe_visibility_private
-            )
+            binding.textTime.text = ctx.getString(R.string.prep_time_format, recipe.prepTimeMin)
+            val count = recipe.ingredients.size
+            binding.textIngredients.text =
+                "· " + ctx.resources.getQuantityString(R.plurals.ingredients_count, count, count)
+
+            if (recipe.isPublic) {
+                binding.textBadge.setText(R.string.recipe_visibility_public)
+                binding.textBadge.setBackgroundResource(R.drawable.bg_status_public)
+                binding.textBadge.setTextColor(Color.parseColor("#5C6E3F"))
+            } else {
+                binding.textBadge.setText(R.string.recipe_visibility_private)
+                binding.textBadge.setBackgroundResource(R.drawable.bg_status_private)
+                binding.textBadge.setTextColor(Color.parseColor("#8A7766"))
+            }
+
             Glide.with(ctx)
                 .load(recipe.imageUrl)
                 .placeholder(R.drawable.ic_recipe_placeholder)
@@ -43,14 +53,6 @@ class RecipeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        if (horizontal) {
-            val widthPx = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 300f, parent.resources.displayMetrics
-            ).toInt()
-            binding.root.layoutParams = RecyclerView.LayoutParams(
-                widthPx, RecyclerView.LayoutParams.WRAP_CONTENT
-            )
-        }
         return VH(binding)
     }
 

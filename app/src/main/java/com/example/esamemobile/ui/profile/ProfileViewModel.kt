@@ -2,71 +2,102 @@ package com.example.esamemobile.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.esamemobile.data.model.Recipe
-import com.example.esamemobile.data.model.RecipeMatch
+import com.example.esamemobile.data.repository.AuthRepository
 import com.example.esamemobile.data.repository.FavoritesRepository
-import com.example.esamemobile.data.repository.PantryRepository
+import com.example.esamemobile.data.repository.FriendsRepository
 import com.example.esamemobile.data.repository.RecipeRepository
-import com.example.esamemobile.util.IngredientMatcher
-import com.example.esamemobile.util.Resource
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * Gestione account del Profilo: modifica nome, cambio email/password e reset
+ * password. Gli esiti sono notificati come eventi one-shot.
+ */
 class ProfileViewModel(
-    private val repository: RecipeRepository = RecipeRepository(),
+    private val auth: AuthRepository = AuthRepository(),
+    private val recipeRepository: RecipeRepository = RecipeRepository(),
     private val favoritesRepository: FavoritesRepository = FavoritesRepository(),
-    private val pantryRepository: PantryRepository = PantryRepository(),
+    private val friendsRepository: FriendsRepository = FriendsRepository(),
 ) : ViewModel() {
 
-    private val _myRecipes = MutableStateFlow<Resource<List<Recipe>>>(Resource.Loading)
-    val myRecipes: StateFlow<Resource<List<Recipe>>> = _myRecipes.asStateFlow()
+    /** Conteggi mostrati nelle statistiche del profilo. */
+    data class Stats(val recipes: Int = 0, val saved: Int = 0, val friends: Int = 0)
 
-    private val _favorites = MutableStateFlow<Resource<List<RecipeMatch>>>(Resource.Loading)
-    val favorites: StateFlow<Resource<List<RecipeMatch>>> = _favorites.asStateFlow()
+    private val _stats = MutableStateFlow(Stats())
+    val stats: StateFlow<Stats> = _stats.asStateFlow()
 
-    fun loadMyRecipes() {
-        _myRecipes.value = Resource.Loading
+    /** Carica (best-effort) i conteggi: ricette pubblicate, salvate e amici. */
+    fun loadStats() {
         viewModelScope.launch {
-            _myRecipes.value = runCatching { repository.getMyRecipes() }
-                .fold(
-                    onSuccess = { Resource.Success(it) },
-                    onFailure = { Resource.Error(it.message ?: "Errore caricamento ricette", it) },
-                )
+            val recipes = runCatching { recipeRepository.getMyRecipes().size }.getOrDefault(0)
+            val saved = runCatching { favoritesRepository.getFavoriteIds().size }.getOrDefault(0)
+            val friends = runCatching { friendsRepository.getFriends().size }.getOrDefault(0)
+            _stats.value = Stats(recipes, saved, friends)
         }
     }
 
-    /** Ricettario personale: le ricette salvate nei preferiti, annotate sulla dispensa. */
-    fun loadFavorites() {
-        _favorites.value = Resource.Loading
+    sealed interface Event {
+        data class NameUpdated(val name: String) : Event
+        data object PasswordUpdated : Event
+        data object EmailVerificationSent : Event
+        data class PasswordResetSent(val email: String) : Event
+        data class EmailReconciled(val email: String) : Event
+        data object SessionRevoked : Event
+        data class Error(val message: String) : Event
+    }
+
+    private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+    val events: SharedFlow<Event> = _events.asSharedFlow()
+
+    fun updateName(name: String) = launchCatching("Errore aggiornamento nome") {
+        auth.updateDisplayName(name)
+        _events.emit(Event.NameUpdated(name.trim()))
+    }
+
+    fun changePassword(currentPassword: String, newPassword: String) =
+        launchCatching("Errore cambio password") {
+            auth.changePassword(currentPassword, newPassword)
+            _events.emit(Event.PasswordUpdated)
+        }
+
+    fun changeEmail(currentPassword: String, newEmail: String) =
+        launchCatching("Errore cambio email") {
+            auth.changeEmail(currentPassword, newEmail)
+            _events.emit(Event.EmailVerificationSent)
+        }
+
+    fun sendPasswordReset() = launchCatching("Errore invio email") {
+        val email = auth.sendPasswordReset()
+        _events.emit(Event.PasswordResetSent(email))
+    }
+
+    /**
+     * Riallinea (best-effort) l'email del profilo dopo la verifica del cambio.
+     * Eventuali errori (es. offline) sono ignorati: si riproverà al rientro.
+     */
+    fun reconcileEmail() {
         viewModelScope.launch {
-            _favorites.value = runCatching {
-                val ids = favoritesRepository.getFavoriteIds()
-                val recipes = repository.getRecipesByIds(ids)
-                val pantry = pantryRepository.getPantry()
-                IngredientMatcher.annotate(pantry, recipes)
-            }.fold(
-                onSuccess = { Resource.Success(it) },
-                onFailure = { Resource.Error(it.message ?: "Errore caricamento preferiti", it) },
-            )
+            runCatching { auth.reconcileEmail() }.onSuccess { result ->
+                when (result) {
+                    is AuthRepository.EmailSync.Updated ->
+                        _events.emit(Event.EmailReconciled(result.email))
+                    AuthRepository.EmailSync.SessionRevoked ->
+                        _events.emit(Event.SessionRevoked)
+                    AuthRepository.EmailSync.Unchanged -> Unit
+                }
+            }
         }
     }
 
-    /** Rimuove una ricetta dai preferiti e ricarica l'elenco. */
-    fun removeFavorite(recipeId: String) {
+    private fun launchCatching(fallback: String, block: suspend () -> Unit) {
         viewModelScope.launch {
-            runCatching { favoritesRepository.setFavorite(recipeId, false) }
-                .onSuccess { loadFavorites() }
-                .onFailure { _favorites.value = Resource.Error(it.message ?: "Errore", it) }
-        }
-    }
-
-    fun deleteRecipe(recipeId: String) {
-        viewModelScope.launch {
-            runCatching { repository.deleteRecipe(recipeId) }
-                .onSuccess { loadMyRecipes() }
-                .onFailure { _myRecipes.value = Resource.Error(it.message ?: "Errore eliminazione", it) }
+            runCatching { block() }
+                .onFailure { _events.emit(Event.Error(it.message ?: fallback)) }
         }
     }
 }

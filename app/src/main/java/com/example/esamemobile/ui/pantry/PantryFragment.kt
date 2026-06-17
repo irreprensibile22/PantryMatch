@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.esamemobile.R
 import com.example.esamemobile.data.model.PantryItem
+import com.example.esamemobile.data.repository.AuthRepository
 import com.example.esamemobile.databinding.DialogAddIngredientBinding
 import com.example.esamemobile.databinding.FragmentPantryBinding
 import com.example.esamemobile.util.Resource
@@ -40,6 +41,9 @@ class PantryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerPantry.adapter = adapter
         binding.fabAdd.setOnClickListener { showItemDialog() }
+
+        val name = runCatching { AuthRepository().currentUser?.displayName }.getOrNull()
+        binding.textProfileInitial.text = name?.trim()?.firstOrNull()?.uppercase() ?: "?"
         binding.swipeRefresh.setOnRefreshListener { viewModel.load() }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -57,6 +61,9 @@ class PantryFragment : Fragment() {
             is Resource.Success -> {
                 adapter.submitList(state.data)
                 binding.textEmpty.visibility = if (state.data.isEmpty()) View.VISIBLE else View.GONE
+                binding.textPantryCount.text = resources.getQuantityString(
+                    R.plurals.pantry_count, state.data.size, state.data.size
+                )
             }
             is Resource.Error ->
                 Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()

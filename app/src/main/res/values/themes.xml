@@ -37,4 +37,10 @@
     </style>
 
     <style name="Theme.ESAMEMOBILE" parent="Base.Theme.ESAMEMOBILE" />
+
+    <!-- Bottom nav stile "Tavola": niente pillola indicatore, solo icona/label colorate. -->
+    <style name="TavolaNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:width">0dp</item>
+        <item name="android:height">0dp</item>
+    </style>
 </resources>

@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.esamemobile.R
 import com.example.esamemobile.data.model.RecipeMatch
+import com.example.esamemobile.data.repository.AuthRepository
 import com.example.esamemobile.databinding.DialogFiltersBinding
 import com.example.esamemobile.databinding.FragmentSearchBinding
 import com.example.esamemobile.ui.recipe.RecipeDetailFragment
@@ -42,6 +43,11 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerResults.adapter = adapter
+
+        // Avatar header: iniziale dell'utente loggato (fallback "?").
+        val name = runCatching { AuthRepository().currentUser?.displayName }.getOrNull()
+        binding.textProfileInitial.text =
+            name?.trim()?.firstOrNull()?.uppercase() ?: "?"
 
         binding.buttonFilters.setOnClickListener { showFilterDialog() }
 

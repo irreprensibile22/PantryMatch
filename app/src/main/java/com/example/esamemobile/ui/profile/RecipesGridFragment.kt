@@ -39,6 +39,15 @@ class RecipesGridFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerGrid.adapter = adapter
 
+        val saved = arguments?.getString(ARG_MODE) == MODE_SAVED
+        binding.textHeaderTitle.setText(
+            if (saved) R.string.recipe_book_tab_saved else R.string.profile_my_recipes
+        )
+        binding.textHeaderSubtitle.setText(
+            if (saved) R.string.recipe_book_subtitle_saved else R.string.recipe_book_subtitle_mine
+        )
+        binding.buttonBack.setOnClickListener { findNavController().navigateUp() }
+
         binding.editSearch.doAfterTextChanged { viewModel.search(it?.toString().orEmpty()) }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -46,7 +55,7 @@ class RecipesGridFragment : Fragment() {
                 viewModel.recipes.collect { render(it) }
             }
         }
-        viewModel.load()
+        viewModel.load(if (saved) RecipesGridViewModel.Mode.SAVED else RecipesGridViewModel.Mode.MINE)
     }
 
     private fun render(state: Resource<List<Recipe>>) {
@@ -73,5 +82,10 @@ class RecipesGridFragment : Fragment() {
         super.onDestroyView()
         binding.recyclerGrid.adapter = null
         _binding = null
+    }
+
+    companion object {
+        const val ARG_MODE = "mode"
+        const val MODE_SAVED = "saved"
     }
 }

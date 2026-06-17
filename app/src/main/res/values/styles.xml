@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Stili condivisi del look "Tavola" (Profilo) -->
+
+    <style name="TavolaStatCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="cardBackgroundColor">@color/tavola_card</item>
+        <item name="cardCornerRadius">18dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="strokeColor">@color/tavola_hairline</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="TavolaStatNumber">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/tavola_accent</item>
+    </style>
+
+    <style name="TavolaStatLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:textSize">11.5sp</item>
+        <item name="android:textColor">@color/tavola_muted</item>
+    </style>
+
+    <style name="TavolaSectionLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/tavola_label</item>
+    </style>
+
+    <style name="TavolaListCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardBackgroundColor">@color/tavola_card</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="strokeColor">@color/tavola_hairline</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="TavolaRowDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
+    </style>
+</resources>

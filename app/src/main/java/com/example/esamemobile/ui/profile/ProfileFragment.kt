@@ -1,35 +1,34 @@
 package com.example.esamemobile.ui.profile
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.core.widget.doAfterTextChanged
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.esamemobile.R
-import com.example.esamemobile.data.model.Recipe
-import com.example.esamemobile.data.model.RecipeMatch
 import com.example.esamemobile.data.repository.AuthRepository
+import com.example.esamemobile.databinding.DialogChangeEmailBinding
+import com.example.esamemobile.databinding.DialogChangePasswordBinding
+import com.example.esamemobile.databinding.DialogEditNameBinding
 import com.example.esamemobile.databinding.FragmentProfileBinding
-import com.example.esamemobile.ui.recipe.RecipeDetailFragment
-import com.example.esamemobile.ui.recipe.RecipeEditFragment
-import com.example.esamemobile.ui.search.RecipeMatchAdapter
-import com.example.esamemobile.util.Resource
+import com.example.esamemobile.util.SettingsPrefs
+import com.example.esamemobile.work.PantryMatchScheduler
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 /**
- * Profilo dell'utente: dati base, "Le mie ricette" (scorrimento orizzontale, con
- * ricerca testuale e "Vedi tutte"), il ricettario "Preferiti" (con ricerca) e
- * logout.
+ * Profilo dell'utente: hero (avatar, nome, email), statistiche (ricette/salvate/
+ * amici), gestione account (modifica nome, cambio email/password, reset password),
+ * preferenza notifiche e logout. Le ricette pubblicate/preferite sono nel
+ * Ricettario (RecipeBookFragment).
  */
 class ProfileFragment : Fragment() {
 
@@ -38,22 +37,6 @@ class ProfileFragment : Fragment() {
 
     private val authRepository = AuthRepository()
     private val viewModel: ProfileViewModel by viewModels()
-    private val adapter = RecipeAdapter(
-        onClick = { openDetail(it.id) },
-        onEdit = { openEdit(it) },
-        onDelete = { confirmDelete(it) },
-        horizontal = true,
-    )
-    private val favoritesAdapter = RecipeMatchAdapter(
-        onClick = { openDetail(it.recipe.id) },
-        onToggleFavorite = { match, favorite ->
-            if (!favorite) viewModel.removeFavorite(match.recipe.id)
-        },
-    )
-
-    // Ultimi dati caricati, per applicare la ricerca testuale lato client.
-    private var allMyRecipes: List<Recipe> = emptyList()
-    private var allFavorites: List<RecipeMatch> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -63,30 +46,9 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val user = runCatching { authRepository.currentUser }.getOrNull()
-        binding.textName.text = user?.displayName?.takeIf { it.isNotBlank() }
-            ?: getString(R.string.profile_guest)
-        binding.textEmail.text = user?.email ?: "—"
-
-        binding.recyclerRecipes.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerRecipes.adapter = adapter
-        binding.recyclerFavorites.adapter = favoritesAdapter
-
-        binding.fabAddRecipe.setOnClickListener {
-            findNavController().navigate(R.id.action_profile_to_edit)
-        }
-        binding.buttonSeeAllMyRecipes.setOnClickListener {
-            findNavController().navigate(R.id.action_profile_to_recipes_grid)
-        }
-        binding.buttonSearchMyRecipes.setOnClickListener {
-            toggleSearch(binding.layoutSearchMyRecipes, binding.editSearchMyRecipes)
-        }
-        binding.editSearchMyRecipes.doAfterTextChanged { applyMyRecipesFilter() }
-        binding.buttonSearchFavorites.setOnClickListener {
-            toggleSearch(binding.layoutSearchFavorites, binding.editSearchFavorites)
-        }
-        binding.editSearchFavorites.doAfterTextChanged { applyFavoritesFilter() }
+        bindUser()
+        setupAccountRows()
+        setupNotificationsSwitch()
 
         binding.buttonLogout.setOnClickListener {
             runCatching { authRepository.logout() }
@@ -95,108 +57,184 @@ class ProfileFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.myRecipes.collect { renderMyRecipes(it) } }
-                launch { viewModel.favorites.collect { renderFavorites(it) } }
+                launch { viewModel.events.collect { handleEvent(it) } }
+                launch { viewModel.stats.collect { renderStats(it) } }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Ricarica al rientro (es. dopo aver creato una ricetta o aggiunto un preferito)
-        viewModel.loadMyRecipes()
-        viewModel.loadFavorites()
+        // Al rientro: riallinea l'email del profilo e aggiorna i conteggi.
+        viewModel.reconcileEmail()
+        viewModel.loadStats()
     }
 
-    /** Mostra/nasconde il campo di ricerca; quando si nasconde azzera il filtro. */
-    private fun toggleSearch(layout: View, editText: android.widget.EditText) {
-        if (layout.visibility == View.VISIBLE) {
-            editText.text?.clear()
-            layout.visibility = View.GONE
-        } else {
-            layout.visibility = View.VISIBLE
-            editText.requestFocus()
+    private fun bindUser() {
+        val user = runCatching { authRepository.currentUser }.getOrNull()
+        val name = user?.displayName?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.profile_guest)
+        binding.textName.text = name
+        binding.textEmail.text = user?.email ?: "—"
+        binding.textAvatar.text = name.trim().firstOrNull()?.uppercase() ?: "?"
+    }
+
+    private fun renderStats(stats: ProfileViewModel.Stats) {
+        binding.textStatRecipes.text = stats.recipes.toString()
+        binding.textStatSaved.text = stats.saved.toString()
+        binding.textStatFriends.text = stats.friends.toString()
+    }
+
+    private fun setupAccountRows() {
+        binding.rowEditName.imageIcon.setImageResource(R.drawable.ic_edit)
+        binding.rowEditName.textLabel.setText(R.string.profile_edit_name)
+        binding.rowEditName.root.setOnClickListener { showEditNameDialog() }
+
+        binding.rowChangeEmail.imageIcon.setImageResource(R.drawable.ic_mail)
+        binding.rowChangeEmail.textLabel.setText(R.string.profile_change_email)
+        binding.rowChangeEmail.root.setOnClickListener { showChangeEmailDialog() }
+
+        binding.rowChangePassword.imageIcon.setImageResource(R.drawable.ic_lock)
+        binding.rowChangePassword.textLabel.setText(R.string.profile_change_password)
+        binding.rowChangePassword.root.setOnClickListener { showChangePasswordDialog() }
+
+        binding.rowResetPassword.imageIcon.setImageResource(R.drawable.ic_reset)
+        binding.rowResetPassword.textLabel.setText(R.string.profile_reset_password)
+        binding.rowResetPassword.root.setOnClickListener { showResetPasswordDialog() }
+    }
+
+    private fun setupNotificationsSwitch() {
+        binding.switchNotifications.isChecked = SettingsPrefs.notificationsEnabled(requireContext())
+        binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+            val ctx = requireContext().applicationContext
+            SettingsPrefs.setNotificationsEnabled(ctx, isChecked)
+            if (isChecked) PantryMatchScheduler.schedule(ctx) else PantryMatchScheduler.cancel(ctx)
         }
     }
 
-    private fun renderMyRecipes(state: Resource<List<Recipe>>) {
-        when (state) {
-            is Resource.Loading -> Unit
-            is Resource.Success -> {
-                allMyRecipes = state.data
-                applyMyRecipesFilter()
+    private fun handleEvent(event: ProfileViewModel.Event) {
+        when (event) {
+            is ProfileViewModel.Event.NameUpdated -> {
+                bindUser()
+                toast(getString(R.string.profile_name_updated))
             }
-            is Resource.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
-        }
-    }
-
-    private fun applyMyRecipesFilter() {
-        val query = binding.editSearchMyRecipes.text?.toString()?.trim().orEmpty()
-        val filtered =
-            if (query.isEmpty()) allMyRecipes
-            else allMyRecipes.filter { it.title.contains(query, ignoreCase = true) }
-        adapter.submitList(filtered)
-        updateEmpty(binding.textEmpty, filtered.isEmpty(), query, R.string.profile_no_recipes)
-    }
-
-    private fun renderFavorites(state: Resource<List<RecipeMatch>>) {
-        when (state) {
-            is Resource.Loading -> Unit
-            is Resource.Success -> {
-                allFavorites = state.data
-                // Nel ricettario sono tutte preferite: cuori pieni.
-                favoritesAdapter.favoriteIds = state.data.map { it.recipe.id }.toSet()
-                applyFavoritesFilter()
+            is ProfileViewModel.Event.PasswordUpdated ->
+                toast(getString(R.string.profile_password_updated))
+            is ProfileViewModel.Event.EmailVerificationSent ->
+                toast(getString(R.string.profile_email_verification_sent))
+            is ProfileViewModel.Event.PasswordResetSent ->
+                toast(getString(R.string.profile_reset_password_sent, event.email))
+            is ProfileViewModel.Event.EmailReconciled -> {
+                bindUser()
+                toast(getString(R.string.profile_email_updated))
             }
-            is Resource.Error ->
-                Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
+            is ProfileViewModel.Event.SessionRevoked -> {
+                Toast.makeText(
+                    requireContext(), R.string.session_revoked_relogin, Toast.LENGTH_LONG
+                ).show()
+                findNavController().navigate(R.id.action_profile_to_login)
+            }
+            is ProfileViewModel.Event.Error ->
+                toast(event.message)
         }
     }
 
-    private fun applyFavoritesFilter() {
-        val query = binding.editSearchFavorites.text?.toString()?.trim().orEmpty()
-        val filtered =
-            if (query.isEmpty()) allFavorites
-            else allFavorites.filter { it.recipe.title.contains(query, ignoreCase = true) }
-        favoritesAdapter.submitList(filtered)
-        updateEmpty(binding.textFavoritesEmpty, filtered.isEmpty(), query, R.string.profile_no_favorites)
-    }
-
-    private fun updateEmpty(view: android.widget.TextView, isEmpty: Boolean, query: String, emptyRes: Int) {
-        view.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        if (isEmpty) {
-            view.text = getString(if (query.isEmpty()) emptyRes else R.string.search_no_results)
-        }
-    }
-
-    private fun openDetail(recipeId: String) {
-        findNavController().navigate(
-            R.id.action_profile_to_detail,
-            bundleOf(RecipeDetailFragment.ARG_RECIPE_ID to recipeId),
-        )
-    }
-
-    private fun openEdit(recipe: Recipe) {
-        findNavController().navigate(
-            R.id.action_profile_to_edit,
-            bundleOf(RecipeEditFragment.ARG_RECIPE_ID to recipe.id),
-        )
-    }
-
-    private fun confirmDelete(recipe: Recipe) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.detail_delete_title)
-            .setMessage(R.string.detail_delete_message)
+    private fun showEditNameDialog() {
+        val b = DialogEditNameBinding.inflate(layoutInflater)
+        b.editName.setText(binding.textName.text)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.profile_edit_name)
+            .setView(b.root)
             .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.detail_delete) { _, _ -> viewModel.deleteRecipe(recipe.id) }
+            .setPositiveButton(R.string.action_save, null)
+            .show()
+        dialog.positiveButton().setOnClickListener {
+            val name = b.editName.text?.toString()?.trim().orEmpty()
+            if (name.isEmpty()) {
+                b.layoutName.error = getString(R.string.field_required)
+                return@setOnClickListener
+            }
+            viewModel.updateName(name)
+            dialog.dismiss()
+        }
+    }
+
+    private fun showChangeEmailDialog() {
+        val b = DialogChangeEmailBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.profile_change_email)
+            .setView(b.root)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_save, null)
+            .show()
+        dialog.positiveButton().setOnClickListener {
+            val email = b.editNewEmail.text?.toString()?.trim().orEmpty()
+            val current = b.editCurrentPassword.text?.toString().orEmpty()
+            b.layoutNewEmail.error = null
+            b.layoutCurrentPassword.error = null
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                b.layoutNewEmail.error = getString(R.string.register_email_invalid)
+                return@setOnClickListener
+            }
+            if (current.isEmpty()) {
+                b.layoutCurrentPassword.error = getString(R.string.field_required)
+                return@setOnClickListener
+            }
+            viewModel.changeEmail(current, email)
+            dialog.dismiss()
+        }
+    }
+
+    private fun showChangePasswordDialog() {
+        val b = DialogChangePasswordBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.profile_change_password)
+            .setView(b.root)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_save, null)
+            .show()
+        dialog.positiveButton().setOnClickListener {
+            val current = b.editCurrentPassword.text?.toString().orEmpty()
+            val new = b.editNewPassword.text?.toString().orEmpty()
+            val confirm = b.editConfirmPassword.text?.toString().orEmpty()
+            b.layoutCurrentPassword.error = null
+            b.layoutNewPassword.error = null
+            b.layoutConfirmPassword.error = null
+            if (current.isEmpty()) {
+                b.layoutCurrentPassword.error = getString(R.string.field_required)
+                return@setOnClickListener
+            }
+            if (new.length < 6) {
+                b.layoutNewPassword.error = getString(R.string.password_min_length)
+                return@setOnClickListener
+            }
+            if (new != confirm) {
+                b.layoutConfirmPassword.error = getString(R.string.register_password_mismatch)
+                return@setOnClickListener
+            }
+            viewModel.changePassword(current, new)
+            dialog.dismiss()
+        }
+    }
+
+    private fun showResetPasswordDialog() {
+        val email = binding.textEmail.text
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.profile_reset_password)
+            .setMessage(getString(R.string.profile_reset_password_message, email))
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.action_send) { _, _ -> viewModel.sendPasswordReset() }
             .show()
     }
 
+    private fun androidx.appcompat.app.AlertDialog.positiveButton() =
+        getButton(android.content.DialogInterface.BUTTON_POSITIVE)
+
+    private fun toast(message: String) =
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.recyclerRecipes.adapter = null
-        binding.recyclerFavorites.adapter = null
         _binding = null
     }
 }

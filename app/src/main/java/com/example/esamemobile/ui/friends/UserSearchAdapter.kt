@@ -15,7 +15,9 @@ class UserSearchAdapter(
 
     inner class VH(val binding: ItemUserSearchBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: UserProfile) {
-            binding.textName.text = user.displayName.ifBlank { user.email }
+            val name = user.displayName.ifBlank { user.email }
+            binding.textName.text = name
+            binding.textAvatar.text = name.trim().firstOrNull()?.uppercase() ?: "?"
             binding.textEmail.text = user.email
             binding.buttonAdd.setOnClickListener { onAdd(user) }
         }

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -44,8 +43,9 @@ class FriendRecipesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity as? AppCompatActivity)?.supportActionBar?.title =
+        binding.textHeaderTitle.text =
             authorName.ifBlank { getString(R.string.nav_friend_recipes) }
+        binding.buttonBack.setOnClickListener { findNavController().navigateUp() }
 
         binding.recyclerResults.adapter = adapter
 

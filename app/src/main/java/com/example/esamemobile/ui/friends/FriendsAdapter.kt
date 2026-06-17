@@ -18,7 +18,9 @@ class FriendsAdapter(
     inner class VH(val binding: ItemFriendBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FriendItem) {
             val friend = item.friend
-            binding.textName.text = friend.displayName.ifBlank { friend.email }
+            val name = friend.displayName.ifBlank { friend.email }
+            binding.textName.text = name
+            binding.textAvatar.text = name.trim().firstOrNull()?.uppercase() ?: "?"
             binding.textEmail.text = friend.email
             binding.textRecipeCount.text = binding.root.resources.getQuantityString(
                 R.plurals.friend_recipe_count, item.recipeCount, item.recipeCount

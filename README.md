@@ -33,7 +33,8 @@ app/src/main/java/com/example/esamemobile/
  │   ├─ search/                  # Home/Feed community + dialog Filtri (Disponibilità/Categoria)
  │   ├─ recipe/                  # Dettaglio + Crea/Modifica: Fragment, ViewModel
  │   ├─ friends/                 # Amici + ricette dell'amico (FriendRecipes): Fragment, ViewModel, Adapter
- │   └─ profile/                 # Profilo + le mie ricette + Preferiti + logout
+ │   ├─ recipebook/              # Ricettario: le mie ricette + Preferiti (+ "Vedi tutte")
+ │   └─ profile/                 # Profilo: dati utente + logout (+ griglia "Le mie ricette")
  ├─ work/                        # Background: PantryMatchWorker + Scheduler (WorkManager)
  └─ util/
      ├─ IngredientMatcher.kt     # cuore: matching dispensa ↔ ricette
@@ -179,14 +180,119 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
 
 ### Migliorie
 
-- ✅ **Tema arancione (Material 3)**: schema colore personalizzato incentrato
-  sull'arancione, con token completi *light* (`values/colors.xml`) e *dark*
-  (`values-night/colors.xml`) mappati sugli attributi M3 in `values/themes.xml`
+- ✅ **Sotto-schermate a lista in stile "Tavola"**: le due sotto-schermate che
+  ancora usavano la top bar globale — **Ricette dell'amico** (`FriendRecipesFragment`)
+  e **Griglia "Vedi tutte"** (`RecipesGridFragment`) — adottano ora lo stesso
+  **header editoriale interno** delle 5 schermate principali (sfondo crema
+  `tavola_bg`, header `tavola_header` con titolo serif + sottotitolo + hairline) con
+  una **freccia indietro** dedicata (`ic_arrow_back`, cablata a `navigateUp()`); la
+  **top bar globale è nascosta** anche qui (`MainActivity` aggiunge
+  `friendRecipesFragment`/`recipesGridFragment` alla lista `ownHeader`). Il titolo è
+  popolato a runtime (nome dell'amico / "Le mie ricette" o "Salvati" per modalità) e
+  la ricerca della griglia usa la **search box stile Tavola** (`bg_search_box`).
+  Dettaglio ed Editor restano con la toolbar (necessaria per back + azioni
+  preferiti/condividi/modifica/elimina e salvataggio) ma poggiano già sul fondo
+  crema (`android:colorBackground` = `#F4ECE0`).
+- ✅ **Profilo — gestione account**: la schermata Profilo ha una sezione **Account**
+  con **modifica nome**, **cambio email**, **cambio password** e **reset password
+  via email**. Logica in `AuthRepository` (`updateDisplayName` → FirebaseAuth +
+  doc Firestore con `SetOptions.merge()`; `changePassword`/`changeEmail` con
+  **re-autenticazione** via `EmailAuthProvider` perché Firebase richiede un accesso
+  recente; il cambio email usa `verifyBeforeUpdateEmail`, quindi diventa effettivo
+  solo dopo la conferma dal link; `sendPasswordReset`). `ProfileViewModel` espone
+  gli esiti come **eventi one-shot** (`SharedFlow`), il `ProfileFragment` apre
+  dialog dedicati (`dialog_edit_name`/`dialog_change_password`/`dialog_change_email`)
+  con validazione inline. Poiché `verifyBeforeUpdateEmail` non notifica l'avvenuto
+  cambio, l'email del profilo Firestore viene **riallineata best-effort** con
+  `AuthRepository.reconcileEmail()` (fa `reload()` dell'utente e, se l'email
+  verificata differisce dal documento, la aggiorna in lowercase): invocata
+  all'avvio app (`MainActivity`, se loggato) e al rientro nel Profilo
+  (`onResume`), con avviso "Email aggiornata" quando scatta. Cambiando l'email
+  primaria Firebase **revoca la sessione**: `reconcileEmail()` forza un refresh del
+  token (`getIdToken(true)`), intercetta `FirebaseAuthInvalidUserException`, fa
+  `signOut()` e ritorna `EmailSync.SessionRevoked`; la UI mostra "Accedi di nuovo"
+  (Toast) e **reindirizza al login** (sia da `MainActivity` sia dal Profilo),
+  evitando l'errore "utente non autorizzato". L'utente è anche avvisato in anticipo
+  ("dovrai accedere di nuovo") al momento della richiesta di cambio. _Nota: cambio
+  email/password valgono per account email/password; la foto profilo richiederebbe
+  Storage/Blaze._
+- ✅ **Profilo e Ricettario separati**: la logica del profilo è ora distinta da
+  quella delle ricette. Il **Profilo** (`ProfileFragment`) mostra solo avatar,
+  nome, email e **logout**. Il nuovo **Ricettario** (`RecipeBookFragment` +
+  `RecipeBookViewModel`, package `ui.recipebook`) raccoglie le proprie ricette e i
+  preferiti (poi evoluto nei **tab "Le mie ricette / Salvati"** — vedi bullet
+  "Ricettario e Profilo — redesign Tavola"), più il FAB "Aggiungi ricetta". È una
+  **5ª voce della bottom bar**
+  (`Ricettario`, `ic_recipe_book`), destinazione top-level del nav graph con le
+  proprie azioni (`action_recipebook_to_detail/_to_edit/_to_recipes_grid`).
+  `ProfileViewModel` è stato sostituito da `RecipeBookViewModel`. Nella Home è
+  stato inoltre rimosso il sottotitolo "Cucinate dai tuoi amici".
+- ✅ **Ricettario e Profilo — redesign "Tavola" (mockup dedicato)**: entrambe le
+  schermate seguono `Tavola Ricettario & Profilo.dc.html`, con **top bar globale
+  nascosta** (header interno) anche qui.
+  *Ricettario* (`fragment_recipebook` + `RecipeBookFragment`): header con titolo
+  serif "Il tuo ricettario", sottotitolo dinamico e **tab segmentati**
+  (`TabLayout`) **Le mie ricette / Salvati**. "Le mie ricette" sono card a tutta
+  larghezza in stile feed (foto, **badge stato Pubblica/Privata**, tempo + n°
+  ingredienti, azioni modifica/elimina circolari) tramite `item_recipe` +
+  `RecipeAdapter` riscritti; "Salvati" riusa le schede `item_recipe_match` con
+  cuore per rimuovere dai preferiti. **FAB pillola "Aggiungi ricetta"** solo sul
+  tab proprie ricette. Sono mantenuti **ricerca testuale** (un'unica barra che
+  filtra il tab attivo per titolo) e **"Vedi tutte"** su entrambi i tab →
+  `RecipesGridFragment`, ora **parametrico** (`argument mode = mine|saved`):
+  mostra in griglia le proprie ricette o i salvati (`RecipesGridViewModel.Mode`,
+  caricando i preferiti via `getFavoriteIds()` + `getRecipesByIds()`), con titolo
+  della top bar coerente.
+  *Profilo* (`fragment_profile` + `ProfileFragment`): **hero** (avatar con bordo,
+  nome serif, email), **statistiche** Ricette/Salvate/Amici
+  (`ProfileViewModel.loadStats()` su Recipe/Favorites/Friends repository), sezione
+  **Account** a righe (tile icona + label + chevron, `item_account_row`) che
+  riaprono i dialog esistenti, sezione **Preferenze** con **toggle Notifiche**
+  (persistito in `SettingsPrefs`, pianifica/annulla `PantryMatchScheduler`;
+  `MainActivity` rispetta la preferenza all'avvio), **logout** e footer versione.
+  Stili condivisi in `values/styles.xml` (`TavolaStatCard`, `TavolaListCard`, …).
+- ✅ **Tutta l'app sul tema "Tavola"**: i token Material 3 *light*
+  (`values/colors.xml`) sono ritarati sulla palette calda crema/terracotta
+  (background `#F4ECE0`, surface `#FFFCF8`, primary `#C8552B`, primaryContainer
+  `#F7E4D4`), così **le schermate che usano gli attributi del tema si adattano da
+  sole**: top bar, Profilo, Ricettario, Dettaglio, Editor, Ricette dell'amico,
+  Griglia, Login/Registrazione, dialog e input. Le card delle ricette
+  (`item_recipe`, `item_recipe_grid`) passano allo stile Tavola (angoli 18dp,
+  superficie crema, bordo sottile, titolo serif) e il **Dettaglio** ha titolo e
+  intestazioni serif; il titolo del **Login** è serif accentato. L'app è forzata in
+  **tema chiaro** (`AppCompatDelegate.MODE_NIGHT_NO` in `MainActivity`) perché il
+  look Tavola è chiaro/caldo (Home/Dispensa/Amici usano comunque la palette crema).
+- ✅ **Dispensa e Amici — redesign "Tavola"**: anche Dispensa e Amici adottano il
+  look editoriale (mockup `Tavola_Dispensa_Amici.html`) con **header dedicato**
+  (logo + avatar iniziale + titolo serif + sottotitolo/conteggio) e **top bar
+  globale nascosta** anche su questi due tab (`MainActivity`). *Dispensa*: card
+  crema con tile-icona arrotondata, nome serif, quantità e pulsanti circolari
+  modifica (neutro) / elimina (rosso tenue); header con conteggio dinamico
+  (`@plurals/pantry_count`); FAB tondo accentato. *Amici*: search box stilizzata,
+  etichetta sezione "AMICI · n" (`friends_label`), card con avatar iniziale, nome
+  serif, email e chip "N ricette pubblicate" (icona libro), pulsante rimuovi
+  circolare; le card dei risultati ricerca (`item_user_search`) hanno avatar e
+  pulsante "+" accentato. Nuovi drawable: `bg_circle_neutral/_danger`,
+  `bg_ingredient_icon`, `bg_chip_recipes`, `bg_search_box`, `ic_book_small`.
+- ✅ **Home — redesign editoriale "Tavola"**: la Home adotta il look del mockup
+  `Tavola_Home_A.html` — palette calda crema (`tavola_*` in `values/colors.xml`),
+  **header dedicato** nel fragment (logo *Tavola* serif + avatar con l'iniziale
+  dell'utente, titolo "Ricette dalla community" serif, sottotitolo + pillola
+  *Filtri* outline) con la **top bar globale nascosta sulla Home**
+  (`MainActivity` toggle su `appBar`). Le card del feed (`item_recipe_match.xml`)
+  diventano schede crema con angoli 22dp, badge a pillola (*Preparabile* oliva /
+  *Mancante* terracotta), cuore "salva" su scrim chiaro, titolo serif e riga
+  autore con avatar + tempo di preparazione (icona orologio `ic_clock`). La
+  **bottom bar** è ricolorata in crema senza pillola indicatore
+  (`nav_item_color`, `TavolaNavIndicator`).
+- ✅ **Tema Material 3 (base poi evoluta in "Tavola")**: schema colore
+  personalizzato con token mappati sugli attributi M3 in `values/themes.xml`
   (primary/secondary/tertiary, container, surface, outline…). Così FAB, pulsanti,
-  chip selezionati, indicatore della bottom bar, avatar e accenti diventano
-  arancioni in automatico; la **top bar** usa `colorPrimaryContainer` con titolo
-  centrato. Rimosso il `values-night/themes.xml` ridondante: la notte eredita lo
-  stesso tema con i colori scuri.
+  chip selezionati, indicatore della bottom bar, avatar e accenti seguono il tema
+  in automatico; la **top bar** usa `colorPrimaryContainer` con titolo centrato.
+  _I token light sono poi stati ritarati sulla palette calda "Tavola" e l'app è
+  forzata in tema chiaro — vedi bullet "Tutta l'app sul tema Tavola". Il file
+  `values-night/colors.xml` resta in repo ma non è più applicato._
 - ✅ **Profilo — ricette orizzontali, ricerca testuale e "Vedi tutte"**: "Le mie
   ricette" scorre ora **in orizzontale** (card a larghezza fissa, `RecipeAdapter`
   con flag `horizontal`); ogni sezione ha un **pulsante di ricerca testuale** che
@@ -225,12 +331,13 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
   (`item_recipe_match.xml`, `RecipeMatchAdapter` con `favoriteIds` +
   `onToggleFavorite`; `SearchViewModel.toggleFavorite()` con update ottimista e
   `FavoritesRepository.getFavoriteIds()`).
-- ✅ **Profilo — sezione "Preferiti"**: sotto "Le mie ricette" un secondo elenco
+- ✅ **Ricettario — sezione "Preferiti"**: sotto "Le mie ricette" un secondo elenco
   mostra il **ricettario salvato dalla community** con le stesse schede grandi;
-  toccando il cuore si rimuove dai preferiti. Profilo reso scrollabile
-  (`NestedScrollView`) con due liste (`fragment_profile.xml`,
-  `ProfileViewModel.loadFavorites()/removeFavorite()`,
-  `RecipeRepository.getRecipesByIds()`).
+  toccando il cuore si rimuove dai preferiti. Schermata scrollabile
+  (`NestedScrollView`) con due liste (`fragment_recipebook.xml`,
+  `RecipeBookViewModel.loadFavorites()/removeFavorite()`,
+  `RecipeRepository.getRecipesByIds()`). _(prima dentro il Profilo, ora separata —
+  vedi bullet "Profilo e Ricettario separati".)_
 - ✅ **Home/Feed come schermata iniziale**: il tab **Cerca** è diventato la
   **Home** dell'app (prima voce della bottom bar, icona casa, start destination
   del nav graph; login/registrazione atterrano qui). All'apertura mostra un
@@ -247,10 +354,10 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
 - ✅ **Dispensa — unità a tendina**: il campo *Unità* non è più a testo libero ma
   un menu a tendina con le unità principali (`@array/pantry_units`: g, kg, ml, l,
   pz, cucchiaino, cucchiaio, tazza, pizzico, q.b., oltre a "nessuna").
-- ✅ **Le mie ricette — azioni rapide**: ogni card nel profilo ha i pulsanti
+- ✅ **Le mie ricette — azioni rapide**: ogni card nel Ricettario ha i pulsanti
   **modifica** (apre l'editor con `recipeId`) ed **elimina** (con conferma)
   oltre al tap sulla card che apre il dettaglio
-  (`RecipeAdapter.onEdit/onDelete` + `ProfileViewModel.deleteRecipe`).
+  (`RecipeAdapter.onEdit/onDelete` + `RecipeBookViewModel.deleteRecipe`).
 - ✅ **Storage opzionale (piano Spark)**: se l'upload immagine fallisce, la
   ricetta è salvata comunque senza foto (avviso `recipe_saved_no_photo`).
 - 🐛 **Fix ricerca community/amici**: il boolean Kotlin `isPublic` veniva

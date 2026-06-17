@@ -2,54 +2,87 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="12dp">
+    android:layout_marginBottom="13dp"
+    app:cardBackgroundColor="@color/tavola_card"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/tavola_hairline"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:paddingStart="18dp"
+        android:paddingTop="15dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="15dp">
+
+        <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_ingredient_icon"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            android:src="@drawable/ic_pantry"
+            app:tint="@color/tavola_accent" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                tools:text="Pomodoro"
-                xmlns:tools="http://schemas.android.com/tools" />
+                android:ellipsize="end"
+                android:fontFamily="serif"
+                android:letterSpacing="-0.005"
+                android:maxLines="1"
+                android:textColor="@color/tavola_ink"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Pomodoro" />
 
             <TextView
                 android:id="@+id/textQuantity"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodySmall" />
+                android:layout_marginTop="2dp"
+                android:textColor="@color/tavola_muted"
+                android:textSize="13sp"
+                tools:text="100 g" />
         </LinearLayout>
 
         <ImageButton
             android:id="@+id/buttonEdit"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_circle_neutral"
             android:contentDescription="@string/edit"
-            android:src="@android:drawable/ic_menu_edit" />
+            android:padding="9dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_edit"
+            app:tint="@color/tavola_icon_stroke" />
 
         <ImageButton
             android:id="@+id/buttonDelete"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_circle_danger"
             android:contentDescription="@string/delete"
-            android:src="@android:drawable/ic_menu_delete" />
+            android:padding="9dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/tavola_danger" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

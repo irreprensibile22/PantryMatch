@@ -17,6 +17,11 @@
         android:title="@string/nav_friends" />
 
     <item
+        android:id="@+id/recipeBookFragment"
+        android:icon="@drawable/ic_recipe_book"
+        android:title="@string/nav_recipe_book" />
+
+    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"
         android:title="@string/nav_profile" />

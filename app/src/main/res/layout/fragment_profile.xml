@@ -1,195 +1,244 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/tavola_bg"
+    android:fillViewport="true">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- hero -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/tavola_header"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="22dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="30dp">
+
+            <TextView
+                android:id="@+id/textAvatar"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:background="@drawable/bg_avatar_hero"
+                android:fontFamily="serif"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                tools:text="A" />
+
+            <TextView
+                android:id="@+id/textName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="serif"
+                android:letterSpacing="-0.01"
+                android:textColor="@color/tavola_ink"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                tools:text="admin" />
+
+            <TextView
+                android:id="@+id/textEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:textColor="@color/tavola_muted"
+                android:textSize="13.5sp"
+                tools:text="admin@admin.com" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="88dp">
+            android:paddingHorizontal="22dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp">
 
+            <!-- stats -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="@string/profile"
-                    android:src="@android:drawable/ic_menu_myplaces" />
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/TavolaStatCard"
+                    android:layout_marginEnd="11dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="15dp">
+
+                        <TextView
+                            android:id="@+id/textStatRecipes"
+                            style="@style/TavolaStatNumber"
+                            tools:text="3" />
+
+                        <TextView
+                            style="@style/TavolaStatLabel"
+                            android:text="@string/profile_stat_recipes" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/TavolaStatCard"
+                    android:layout_marginEnd="11dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="15dp">
+
+                        <TextView
+                            android:id="@+id/textStatSaved"
+                            style="@style/TavolaStatNumber"
+                            tools:text="12" />
+
+                        <TextView
+                            style="@style/TavolaStatLabel"
+                            android:text="@string/profile_stat_saved" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/TavolaStatCard">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="15dp">
+
+                        <TextView
+                            android:id="@+id/textStatFriends"
+                            style="@style/TavolaStatNumber"
+                            tools:text="3" />
+
+                        <TextView
+                            style="@style/TavolaStatLabel"
+                            android:text="@string/profile_stat_friends" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- account -->
+            <TextView
+                style="@style/TavolaSectionLabel"
+                android:layout_marginTop="24dp"
+                android:text="@string/profile_account" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/TavolaListCard">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/textName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+                    <include
+                        layout="@layout/item_account_row"
+                        android:id="@+id/rowEditName" />
 
-                    <TextView
-                        android:id="@+id/textEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+                    <View style="@style/TavolaRowDivider" />
+
+                    <include
+                        layout="@layout/item_account_row"
+                        android:id="@+id/rowChangeEmail" />
+
+                    <View style="@style/TavolaRowDivider" />
+
+                    <include
+                        layout="@layout/item_account_row"
+                        android:id="@+id/rowChangePassword" />
+
+                    <View style="@style/TavolaRowDivider" />
+
+                    <include
+                        layout="@layout/item_account_row"
+                        android:id="@+id/rowResetPassword" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonLogout"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/logout" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/profile_my_recipes"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSearchMyRecipes"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/search_by_name"
-                    app:icon="@drawable/ic_search" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSeeAllMyRecipes"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/profile_see_all" />
-            </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutSearchMyRecipes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/ic_search"
-                android:hint="@string/search_by_name">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editSearchMyRecipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerRecipes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:clipToPadding="false"
-                tools:listitem="@layout/item_recipe" />
-
+            <!-- preferenze -->
             <TextView
-                android:id="@+id/textEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/profile_no_recipes"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:visibility="gone" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/TavolaSectionLabel"
                 android:layout_marginTop="24dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:text="@string/profile_preferences" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/profile_favorites"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+            <com.google.android.material.card.MaterialCardView
+                style="@style/TavolaListCard">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/buttonSearchFavorites"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/search_by_name"
-                    app:icon="@drawable/ic_search" />
-            </LinearLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutSearchFavorites"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/ic_search"
-                android:hint="@string/search_by_name">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editSearchFavorites"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerFavorites"
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="14dp"
+                        android:background="@drawable/bg_tile_accent"
+                        android:contentDescription="@null"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_notification"
+                        app:tint="@color/tavola_accent" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profile_notifications"
+                        android:textColor="@color/tavola_ink"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchNotifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- logout -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonLogout"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:nestedScrollingEnabled="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_recipe_match" />
+                android:layout_marginTop="26dp"
+                android:text="@string/logout"
+                app:cornerRadius="16dp" />
 
             <TextView
-                android:id="@+id/textFavoritesEmpty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/profile_no_favorites"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:visibility="gone" />
+                android:layout_marginTop="18dp"
+                android:gravity="center"
+                android:text="@string/profile_version"
+                android:textColor="@color/tavola_label"
+                android:textSize="12sp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabAddRecipe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/profile_add_recipe"
-        android:text="@string/profile_add_recipe"
-        app:icon="@drawable/ic_add" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </LinearLayout>
+</ScrollView>

@@ -35,7 +35,11 @@
                 android:id="@+id/textTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+                android:fontFamily="serif"
+                android:letterSpacing="-0.01"
+                android:textColor="@color/tavola_ink"
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textAuthor"
@@ -56,8 +60,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:fontFamily="serif"
                 android:text="@string/ingredients"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
+                android:textColor="@color/tavola_ink"
+                android:textSize="19sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textIngredients"
@@ -69,8 +76,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:fontFamily="serif"
                 android:text="@string/steps"
-                android:textAppearance="?attr/textAppearanceTitleMedium" />
+                android:textColor="@color/tavola_ink"
+                android:textSize="19sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textSteps"
