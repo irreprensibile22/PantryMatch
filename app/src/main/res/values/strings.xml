@@ -108,6 +108,8 @@
     <string name="profile">Profilo</string>
     <string name="logout">Esci</string>
     <string name="login">Accedi</string>
+    <string name="login_subtitle">Scopri cosa puoi cucinare con la tua dispensa.</string>
+    <string name="login_or">oppure</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
 
@@ -152,6 +154,7 @@
 
     <!-- Registrazione -->
     <string name="register_title">Crea account</string>
+    <string name="register_subtitle">Unisciti alla community e condividi le tue ricette.</string>
     <string name="register_action">Registrati</string>
     <string name="register_invalid">Compila tutti i campi (password di almeno 6 caratteri).</string>
     <string name="register_email_invalid">Inserisci un\'email valida.</string>
@@ -166,6 +169,14 @@
 
     <!-- Editor ricetta -->
     <string name="nav_recipe_edit">Nuova ricetta</string>
+    <string name="editor_section_details">Dettagli</string>
+    <string name="editor_add_ingredient">Aggiungi ingrediente</string>
+    <string name="editor_no_ingredients">Nessun ingrediente aggiunto.</string>
+    <!-- Dialog ingrediente (Dispensa / Editor) -->
+    <string name="ingredient_dialog_add_title">Aggiungi ingrediente</string>
+    <string name="ingredient_dialog_edit_title">Modifica ingrediente</string>
+    <string name="ingredient_dialog_add">Aggiungi</string>
+    <string name="ingredient_dialog_save">Salva</string>
     <string name="recipe_pick_image">Scegli foto</string>
     <string name="recipe_title_hint">Titolo</string>
     <string name="recipe_description_hint">Descrizione</string>

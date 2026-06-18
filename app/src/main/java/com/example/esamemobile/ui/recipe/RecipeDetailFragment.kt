@@ -18,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.esamemobile.R
+import com.example.esamemobile.data.model.Difficulty
 import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.data.model.RecipeIngredient
 import com.example.esamemobile.databinding.FragmentRecipeDetailBinding
@@ -81,7 +82,10 @@ class RecipeDetailFragment : Fragment() {
             .orEmpty()
         binding.textAuthor.visibility =
             if (binding.textAuthor.text.isNullOrBlank()) View.GONE else View.VISIBLE
+        bindMeta(recipe)
         binding.textDescription.text = recipe.description
+        binding.textDescription.visibility =
+            if (recipe.description.isBlank()) View.GONE else View.VISIBLE
         binding.textIngredients.text =
             recipe.ingredients.joinToString("\n") { "• " + formatIngredient(it) }
         binding.textSteps.text = recipe.steps
@@ -91,6 +95,35 @@ class RecipeDetailFragment : Fragment() {
             .load(recipe.imageUrl)
             .placeholder(R.drawable.ic_recipe_placeholder)
             .into(binding.imageRecipe)
+    }
+
+    /** Popola la riga di pillole meta (categoria · tempo · difficoltà), nascondendo le assenti. */
+    private fun bindMeta(recipe: Recipe) {
+        fun bindPill(view: android.widget.TextView, text: String?) {
+            if (text.isNullOrBlank()) {
+                view.visibility = View.GONE
+            } else {
+                view.text = text
+                view.visibility = View.VISIBLE
+            }
+        }
+        bindPill(binding.textCategory, recipe.category)
+        bindPill(
+            binding.textPrepTime,
+            recipe.prepTimeMin.takeIf { it > 0 }?.let { getString(R.string.prep_time_format, it) },
+        )
+        val difficultyRes = when (runCatching { Difficulty.valueOf(recipe.difficulty) }.getOrNull()) {
+            Difficulty.MEDIUM -> R.string.difficulty_medium
+            Difficulty.HARD -> R.string.difficulty_hard
+            Difficulty.EASY -> R.string.difficulty_easy
+            null -> null
+        }
+        bindPill(binding.textDifficulty, difficultyRes?.let(::getString))
+        binding.rowMeta.visibility = if (
+            binding.textCategory.visibility == View.VISIBLE ||
+            binding.textPrepTime.visibility == View.VISIBLE ||
+            binding.textDifficulty.visibility == View.VISIBLE
+        ) View.VISIBLE else View.GONE
     }
 
     private fun formatIngredient(ing: RecipeIngredient): String = listOfNotNull(

@@ -59,4 +59,7 @@
     <color name="tavola_chip_bg">#FBEBE2</color>
     <color name="tavola_icon_stroke">#7A6757</color>
     <color name="tavola_label">#A8937F</color>
+
+    <!-- Splash screen: sfondo crema della palette Tavola -->
+    <color name="splash_background">#F4ECE0</color>
 </resources>

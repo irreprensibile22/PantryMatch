@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -17,9 +18,13 @@ import com.bumptech.glide.Glide
 import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Difficulty
 import com.example.esamemobile.data.model.Recipe
+import com.example.esamemobile.data.model.RecipeIngredient
+import com.example.esamemobile.databinding.DialogAddIngredientBinding
 import com.example.esamemobile.databinding.FragmentRecipeEditBinding
 import com.example.esamemobile.util.RecipeFormParser
 import com.example.esamemobile.util.Resource
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
@@ -40,6 +45,9 @@ class RecipeEditFragment : Fragment() {
     /** Ricetta esistente in modifica (per conservare id, imageUrl e createdAt). */
     private var editing: Recipe? = null
     private var pickedImage: Uri? = null
+
+    /** Ingredienti aggiunti, gestiti come lista strutturata (chip rimovibili). */
+    private val ingredients = mutableListOf<RecipeIngredient>()
 
     private val imagePicker = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
@@ -63,7 +71,9 @@ class RecipeEditFragment : Fragment() {
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
         }
+        binding.buttonAddIngredient.setOnClickListener { showIngredientDialog() }
         binding.buttonSave.setOnClickListener { save() }
+        renderIngredients()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -88,7 +98,9 @@ class RecipeEditFragment : Fragment() {
         binding.editDescription.setText(recipe.description)
         binding.editCategory.setText(recipe.category, false)
         binding.editPrepTime.setText(if (recipe.prepTimeMin > 0) recipe.prepTimeMin.toString() else "")
-        binding.editIngredients.setText(RecipeFormParser.ingredientsToText(recipe.ingredients))
+        ingredients.clear()
+        ingredients.addAll(recipe.ingredients)
+        renderIngredients()
         binding.editSteps.setText(RecipeFormParser.stepsToText(recipe.steps))
         binding.switchPublic.isChecked = recipe.isPublic
         when (runCatching { Difficulty.valueOf(recipe.difficulty) }.getOrNull()) {
@@ -104,7 +116,6 @@ class RecipeEditFragment : Fragment() {
 
     private fun save() {
         val title = binding.editTitle.text?.toString().orEmpty().trim()
-        val ingredients = RecipeFormParser.parseIngredients(binding.editIngredients.text?.toString().orEmpty())
         if (title.isEmpty() || ingredients.isEmpty()) {
             Snackbar.make(binding.root, getString(R.string.recipe_invalid), Snackbar.LENGTH_LONG).show()
             return
@@ -121,11 +132,84 @@ class RecipeEditFragment : Fragment() {
             category = binding.editCategory.text?.toString().orEmpty().trim(),
             prepTimeMin = binding.editPrepTime.text?.toString()?.toIntOrNull() ?: 0,
             difficulty = difficulty.name,
-            ingredients = ingredients,
+            ingredients = ingredients.toList(),
             steps = RecipeFormParser.parseSteps(binding.editSteps.text?.toString().orEmpty()),
             isPublic = binding.switchPublic.isChecked,
         )
         viewModel.save(recipe, pickedImage)
+    }
+
+    /** Ridisegna i chip degli ingredienti aggiunti (tap = modifica, X = rimuovi). */
+    private fun renderIngredients() {
+        binding.chipGroupIngredients.removeAllViews()
+        ingredients.forEachIndexed { index, ing ->
+            val chip = Chip(requireContext()).apply {
+                text = formatIngredient(ing)
+                isCloseIconVisible = true
+                setOnClickListener { showIngredientDialog(index) }
+                setOnCloseIconClickListener {
+                    ingredients.removeAt(index)
+                    renderIngredients()
+                }
+            }
+            binding.chipGroupIngredients.addView(chip)
+        }
+        binding.textNoIngredients.visibility =
+            if (ingredients.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun formatIngredient(ing: RecipeIngredient): String {
+        val qty = ing.quantity?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() }
+        val tail = listOfNotNull(qty, ing.unit).joinToString(" ")
+        return if (tail.isBlank()) ing.name else "${ing.name} $tail"
+    }
+
+    /**
+     * Dialog condiviso (stesso della Dispensa) per aggiungere un ingrediente
+     * ([editIndex] null) o modificarne uno esistente. Il nome usa il catalogo a
+     * tendina (`ingredient_catalog`) per uniformare gli ingredienti.
+     */
+    private fun showIngredientDialog(editIndex: Int? = null) {
+        val dialogBinding = DialogAddIngredientBinding.inflate(layoutInflater)
+        val noUnit = getString(R.string.unit_none)
+        dialogBinding.editUnit.setAdapter(
+            ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                resources.getStringArray(R.array.pantry_units),
+            )
+        )
+        val existing = editIndex?.let { ingredients[it] }
+        dialogBinding.editUnit.setText(existing?.unit?.takeIf { it.isNotBlank() } ?: noUnit, false)
+        existing?.let {
+            dialogBinding.editName.setText(it.name, false)
+            dialogBinding.editQuantity.setText(
+                it.quantity?.let { q -> if (q % 1.0 == 0.0) q.toInt().toString() else q.toString() }.orEmpty()
+            )
+        }
+        val isEdit = existing != null
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(
+                if (isEdit) R.string.ingredient_dialog_edit_title
+                else R.string.ingredient_dialog_add_title
+            )
+            .setView(dialogBinding.root)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(
+                if (isEdit) R.string.ingredient_dialog_save else R.string.ingredient_dialog_add
+            ) { _, _ ->
+                val name = dialogBinding.editName.text?.toString().orEmpty().trim()
+                if (name.isEmpty()) return@setPositiveButton
+                val quantity = dialogBinding.editQuantity.text?.toString()
+                    ?.replace(',', '.')?.toDoubleOrNull()
+                val unit = dialogBinding.editUnit.text?.toString()
+                    ?.takeIf { it.isNotBlank() && it != noUnit }
+                val ingredient = RecipeIngredient(name = name, quantity = quantity, unit = unit)
+                if (editIndex != null) ingredients[editIndex] = ingredient
+                else ingredients.add(ingredient)
+                renderIngredients()
+            }
+            .show()
     }
 
     private fun onSaveState(state: Resource<RecipeEditViewModel.SaveOutcome>) {

@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -36,6 +37,9 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Splash screen (Android 12+ via androidx): mostra il logo Tavola su sfondo
+        // crema all'avvio, poi passa automaticamente al tema principale dell'app.
+        installSplashScreen()
         // Il design "Tavola" è chiaro/caldo: forziamo il tema chiaro su tutta l'app
         // per coerenza (Home/Dispensa/Amici usano comunque la palette crema).
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Dettaglio ricetta in stile editoriale "Tavola": foto hero, titolo serif,
+     riga meta a pillole (categoria · tempo · difficoltà) e sezioni in card. La
+     toolbar globale resta (back + azioni preferiti/condividi/modifica/elimina). -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/tavola_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,8 +17,8 @@
         <ImageView
             android:id="@+id/imageRecipe"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="?attr/colorSurfaceVariant"
+            android:layout_height="230dp"
+            android:background="@color/tavola_tile"
             android:contentDescription="@string/recipe_image"
             android:scaleType="centerCrop" />
 
@@ -29,7 +34,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="22dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="28dp">
 
             <TextView
                 android:id="@+id/textTitle"
@@ -38,55 +45,107 @@
                 android:fontFamily="serif"
                 android:letterSpacing="-0.01"
                 android:textColor="@color/tavola_ink"
-                android:textSize="26sp"
+                android:textSize="27sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textAuthor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:layout_marginTop="3dp"
+                android:textColor="@color/tavola_muted"
+                android:textSize="13.5sp" />
+
+            <!-- Riga meta: categoria · tempo · difficoltà (pillole) -->
+            <LinearLayout
+                android:id="@+id/rowMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textCategory"
+                    style="@style/TavolaMetaPill"
+                    android:visibility="gone"
+                    tools:text="Primo" />
+
+                <TextView
+                    android:id="@+id/textPrepTime"
+                    style="@style/TavolaMetaPill"
+                    android:layout_marginStart="8dp"
+                    android:drawablePadding="5dp"
+                    app:drawableStartCompat="@drawable/ic_clock"
+                    android:drawableTint="@color/tavola_muted_dark"
+                    android:visibility="gone"
+                    tools:text="30 min" />
+
+                <TextView
+                    android:id="@+id/textDifficulty"
+                    style="@style/TavolaMetaPill"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    tools:text="Facile" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:lineSpacingExtra="3dp"
+                android:textColor="@color/tavola_muted_dark"
+                android:textSize="15sp" />
+
+            <!-- Ingredienti -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
                 android:fontFamily="serif"
                 android:text="@string/ingredients"
                 android:textColor="@color/tavola_ink"
                 android:textSize="19sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textIngredients"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodyMedium" />
+            <com.google.android.material.card.MaterialCardView
+                style="@style/TavolaEditorCard">
 
+                <TextView
+                    android:id="@+id/textIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="4dp"
+                    android:padding="16dp"
+                    android:textColor="@color/tavola_muted_dark"
+                    android:textSize="15sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Procedimento -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
                 android:fontFamily="serif"
                 android:text="@string/steps"
                 android:textColor="@color/tavola_ink"
                 android:textSize="19sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textSteps"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBodyMedium" />
+            <com.google.android.material.card.MaterialCardView
+                style="@style/TavolaEditorCard">
+
+                <TextView
+                    android:id="@+id/textSteps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="5dp"
+                    android:padding="16dp"
+                    android:textColor="@color/tavola_muted_dark"
+                    android:textSize="15sp" />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

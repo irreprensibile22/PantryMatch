@@ -24,6 +24,9 @@
         <item name="colorOnErrorContainer">@color/md_on_error_container</item>
 
         <item name="android:colorBackground">@color/md_background</item>
+        <!-- Sfondo finestra esplicito: dopo lo splash (postSplashScreenTheme) la
+             finestra deve dipingere crema, non nero. -->
+        <item name="android:windowBackground">@color/md_background</item>
         <item name="colorOnBackground">@color/md_on_background</item>
         <item name="colorSurface">@color/md_surface</item>
         <item name="colorOnSurface">@color/md_on_surface</item>
@@ -37,6 +40,14 @@
     </style>
 
     <style name="Theme.ESAMEMOBILE" parent="Base.Theme.ESAMEMOBILE" />
+
+    <!-- Splash screen (Android 12+ via androidx core-splashscreen): sfondo crema
+         "Tavola" + logo dedicato dell'app. Al termine passa al tema principale. -->
+    <style name="Theme.ESAMEMOBILE.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.ESAMEMOBILE</item>
+    </style>
 
     <!-- Bottom nav stile "Tavola": niente pillola indicatore, solo icona/label colorate. -->
     <style name="TavolaNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">

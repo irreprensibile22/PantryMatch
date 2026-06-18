@@ -14,7 +14,8 @@ import java.util.concurrent.TimeUnit
 object PantryMatchScheduler {
 
     private const val WORK_NAME = "pantry_match_periodic"
-    private const val INTERVAL_HOURS = 12L
+    // Intervallo del controllo periodico (minimo consentito da WorkManager: 15 min).
+    private const val INTERVAL_MINUTES = 30L
 
     /**
      * Registra il controllo periodico. Usa una "unique work" con policy KEEP così
@@ -26,7 +27,7 @@ object PantryMatchScheduler {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<PantryMatchWorker>(INTERVAL_HOURS, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<PantryMatchWorker>(INTERVAL_MINUTES, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 

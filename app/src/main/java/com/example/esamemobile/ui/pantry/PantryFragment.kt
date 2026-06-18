@@ -90,7 +90,9 @@ class PantryFragment : Fragment() {
         dialogBinding.editUnit.setText(existing?.unit?.takeIf { it.isNotBlank() } ?: noUnit, false)
 
         existing?.let {
-            dialogBinding.editName.setText(it.name.replaceFirstChar { c -> c.uppercase() })
+            // setText(.., false) per non far comparire il dropdown di suggerimenti
+            // durante il pre-riempimento in modifica.
+            dialogBinding.editName.setText(it.name.replaceFirstChar { c -> c.uppercase() }, false)
             dialogBinding.editQuantity.setText(it.quantity?.let(::trimNumber).orEmpty())
         }
         val isEdit = existing != null

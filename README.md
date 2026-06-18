@@ -169,7 +169,7 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
   **condivisione** via intent `ACTION_SEND`, **azioni autore** modifica/elimina
   (con conferma) visibili solo all'autore, **navigazione ricerca→dettaglio**.
 - ✅ **Step 7 — Background**: `PantryMatchWorker` (WorkManager, `CoroutineWorker`)
-  periodico ogni 12h che confronta la dispensa con le ricette pubbliche e mostra
+  periodico ogni 30 min che confronta la dispensa con le ricette pubbliche e mostra
   una **notifica locale** "Con la tua dispensa puoi preparare N ricette"
   (canale dedicato, permesso `POST_NOTIFICATIONS` richiesto a runtime su
   Android 13+, scheduling unico via `PantryMatchScheduler`).
@@ -180,6 +180,63 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
 
 ### Migliorie
 
+- ✅ **Login e Registrazione in stile "Tavola"**: le schermate di accesso e
+  registrazione adottano il look editoriale crema come il resto dell'app. Entrambe
+  (`fragment_login`/`fragment_register`) sono scrollabili su fondo `tavola_bg`, con
+  **logo** (`ic_logo`, la pentola col check) + **titolo serif** (accent su login,
+  ink su registrazione) e **sottotitolo** (`login_subtitle`/`register_subtitle`); i
+  campi sono **OutlinedBox in card** (`TavolaEditorCard`) con icone iniziali
+  (`ic_mail`/`ic_lock`/`ic_profile`) e i pulsanti primari sono **accentati**
+  (terracotta, angoli 14dp). Il login ha un separatore **"oppure"** (hairline) tra
+  il pulsante Accedi e il **bottone Google** (outline), più il link accentato
+  "Non hai un account? Registrati". Tutti gli ID dei campi/bottoni restano invariati.
+- ✅ **Catalogo ingredienti a tendina (uniforma i nomi)**: inserendo un ingrediente
+  — sia nella **Dispensa** sia in una **ricetta** — un **menu a tendina** suggerisce
+  da un **catalogo condiviso** (`@array/ingredient_catalog`, ~70 voci in forma
+  canonica) così da uniformare i nomi ed evitare doppioni (es. *uovo*/*uova*). Il
+  campo nome del dialog (`dialog_add_ingredient`) è ora un `MaterialAutoCompleteTextView`
+  con `app:simpleItems` (digitazione libera comunque consentita). Nell'**editor
+  ricetta** la vecchia textarea a testo libero degli ingredienti è stata sostituita
+  da una **lista strutturata**: il pulsante "Aggiungi ingrediente" apre lo **stesso
+  dialog** della Dispensa (nome dal catalogo + quantità + unità) e ogni ingrediente
+  diventa un **chip rimovibile** (tap = modifica, X = rimuovi) in
+  `chipGroupIngredients`; `RecipeEditFragment` mantiene la lista in memoria e la usa
+  al salvataggio (niente più parsing testuale). Le forme canoniche del catalogo sono
+  coerenti con `IngredientMatcher.normalize()`/`SYNONYMS`, che continua a ricondurre
+  i plurali al singolare lato matching.
+- ✅ **Editor, Dettaglio e dialog Ingrediente in stile "Tavola"**: le ultime
+  schermate ancora in Material "piatto" adottano il look editoriale crema. *Editor*
+  (`fragment_recipe_edit`): fondo `tavola_bg`, **foto in card arrotondata** con
+  pulsante "Scegli foto" accentato in overlay, campi raggruppati in **sezioni serif**
+  (Dettagli/Ingredienti/Procedimento/Pubblicazione) dentro card morbide
+  (`TavolaEditorCard`/`TavolaEditorSection`), input **OutlinedBox**, switch "Pubblica"
+  in card e pulsante **Salva** terracotta a tutta larghezza. *Dettaglio*
+  (`fragment_recipe_detail`): foto **hero**, titolo serif, **riga meta a pillole**
+  (categoria · tempo · difficoltà, `TavolaMetaPill` su `bg_chip_recipes`, popolata da
+  `RecipeDetailFragment.bindMeta()` con `prep_time_format` e le label difficoltà) e
+  sezioni Ingredienti/Procedimento in card. *Dialog Aggiungi/Modifica ingrediente*
+  (`dialog_add_ingredient`): campi OutlinedBox arrotondati con icona dispensa. La
+  toolbar globale resta su Editor e Dettaglio (back + azioni preferiti/condividi/
+  modifica/elimina e salvataggio) ma il corpo è ora coerente con il resto dell'app.
+- ✅ **Splash screen con logo dedicato**: all'avvio l'app mostra uno **splash
+  screen** (API moderna `androidx.core:core-splashscreen`, Android 12+ nativo e
+  back-compat sulle versioni precedenti) con un **logo vettoriale apposito**
+  (`drawable/ic_logo.xml`): una **pentola** con coperchio, manici e vapore segnata
+  da un **check** = il "match" tra dispensa e ricette preparabili, cuore dell'app.
+  Tinte della **palette "Tavola"** (terracotta `#C8552B`/`#8C4A30` su sfondo crema
+  `splash_background` `#F4ECE0`); il disegno è scalato nella zona sicura del cerchio
+  splash per non essere tagliato. Tema `Theme.ESAMEMOBILE.Splash`
+  (`windowSplashScreenBackground` + `windowSplashScreenAnimatedIcon`, con
+  `postSplashScreenTheme` che torna al tema principale), assegnato all'activity di
+  lancio nel manifest; `MainActivity` chiama `installSplashScreen()` prima di
+  `super.onCreate()`. Il tema principale dichiara un `android:windowBackground`
+  crema esplicito, così la finestra dipinge crema durante la transizione
+  post-splash. Il logo è riutilizzabile anche altrove nell'UI. La stessa
+  identità è applicata all'**icona dell'app** (adaptive-icon): `ic_launcher_background`
+  diventa terracotta pieno e `ic_launcher_foreground` disegna la pentola crema col
+  check (sostituendo il robottino Android di default). _Nota: l'adaptive-icon vale
+  su Android 8+ (API 26); i bitmap legacy `mipmap-*/ic_launcher.webp` per API 24–25
+  vanno rigenerati da Android Studio (Image Asset) se si punta a quei livelli._
 - ✅ **Sotto-schermate a lista in stile "Tavola"**: le due sotto-schermate che
   ancora usavano la top bar globale — **Ricette dell'amico** (`FriendRecipesFragment`)
   e **Griglia "Vedi tutte"** (`RecipesGridFragment`) — adottano ora lo stesso

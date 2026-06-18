@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Catalogo condiviso di ingredienti: alimenta il menu a tendina di suggerimento
+  sia nel dialog della Dispensa sia nell'editor ricetta. Usa forme canoniche
+  (singolare) coerenti con IngredientMatcher.SYNONYMS/normalize(), così da
+  uniformare i nomi ed evitare doppioni tipo "uovo"/"uova". L'utente può comunque
+  digitare un ingrediente non in elenco.
+-->
+<resources>
+    <string-array name="ingredient_catalog">
+        <item>Acciughe</item>
+        <item>Aceto</item>
+        <item>Aglio</item>
+        <item>Asparagi</item>
+        <item>Avena</item>
+        <item>Banana</item>
+        <item>Basilico</item>
+        <item>Brodo</item>
+        <item>Burro</item>
+        <item>Caffè</item>
+        <item>Cannella</item>
+        <item>Capperi</item>
+        <item>Carota</item>
+        <item>Cavolfiore</item>
+        <item>Cavolo</item>
+        <item>Ceci</item>
+        <item>Cetriolo</item>
+        <item>Cioccolato</item>
+        <item>Cipolla</item>
+        <item>Cocco</item>
+        <item>Curry</item>
+        <item>Fagioli</item>
+        <item>Farina</item>
+        <item>Finocchio</item>
+        <item>Formaggio</item>
+        <item>Fragola</item>
+        <item>Funghi</item>
+        <item>Gamberi</item>
+        <item>Lattuga</item>
+        <item>Latte</item>
+        <item>Lenticchie</item>
+        <item>Lievito</item>
+        <item>Limone</item>
+        <item>Maiale</item>
+        <item>Mais</item>
+        <item>Mandorle</item>
+        <item>Manzo</item>
+        <item>Mela</item>
+        <item>Melanzana</item>
+        <item>Miele</item>
+        <item>Mozzarella</item>
+        <item>Noci</item>
+        <item>Olio d\'oliva</item>
+        <item>Origano</item>
+        <item>Pancetta</item>
+        <item>Pane</item>
+        <item>Panna</item>
+        <item>Parmigiano</item>
+        <item>Pasta</item>
+        <item>Patata</item>
+        <item>Pepe</item>
+        <item>Peperone</item>
+        <item>Pesce</item>
+        <item>Piselli</item>
+        <item>Pollo</item>
+        <item>Pomodoro</item>
+        <item>Prezzemolo</item>
+        <item>Prosciutto</item>
+        <item>Riso</item>
+        <item>Rosmarino</item>
+        <item>Sale</item>
+        <item>Salmone</item>
+        <item>Salsiccia</item>
+        <item>Sedano</item>
+        <item>Spinaci</item>
+        <item>Tonno</item>
+        <item>Uovo</item>
+        <item>Vino bianco</item>
+        <item>Vino rosso</item>
+        <item>Yogurt</item>
+        <item>Zucca</item>
+        <item>Zucchero</item>
+        <item>Zucchina</item>
+    </string-array>
+</resources>

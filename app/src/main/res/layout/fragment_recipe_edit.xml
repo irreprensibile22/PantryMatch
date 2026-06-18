@@ -1,176 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Editor "Nuova ricetta / Modifica" in stile editoriale "Tavola": fondo crema,
+     sezioni serif, campi in card morbide, foto con angoli arrotondati. La toolbar
+     globale resta (back + titolo). -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/tavola_bg"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingHorizontal="22dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="28dp">
 
-        <ImageView
-            android:id="@+id/imageRecipe"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="?attr/colorSurfaceVariant"
-            android:contentDescription="@string/recipe_image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_recipe_placeholder" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonPickImage"
-            style="@style/Widget.Material3.Button.TonalButton.Icon"
+        <!-- Foto della ricetta -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/recipe_pick_image"
-            app:icon="@drawable/ic_image" />
+            app:cardBackgroundColor="@color/tavola_card"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/tavola_hairline"
+            app:strokeWidth="1dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/recipe_title_hint">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTitle"
+                <ImageView
+                    android:id="@+id/imageRecipe"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:background="@color/tavola_tile"
+                    android:contentDescription="@string/recipe_image"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_recipe_placeholder" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonPickImage"
+                    style="@style/Widget.Material3.Button.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="12dp"
+                    android:text="@string/recipe_pick_image"
+                    app:backgroundTint="@color/tavola_accent"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/ic_image"
+                    app:iconTint="@color/white"
+                    android:textColor="@color/white" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sezione: Dettagli -->
+        <TextView
+            style="@style/TavolaEditorSection"
+            android:text="@string/editor_section_details" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/TavolaEditorCard">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="vertical"
+                android:padding="14dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/recipe_description_hint">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapSentences|textMultiLine"
-                android:minLines="2" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:hint="@string/recipe_category_hint">
-
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/editCategory"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    app:simpleItems="@array/recipe_categories" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:hint="@string/recipe_title_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/recipe_description_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:minLines="2" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:hint="@string/recipe_category_hint">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/editCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            app:simpleItems="@array/recipe_categories" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:startIconDrawable="@drawable/ic_clock"
+                        android:hint="@string/recipe_prep_time_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editPrepTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/recipe_difficulty"
+                    android:textColor="@color/tavola_muted_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupDifficulty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipEasy"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/difficulty_easy" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipMedium"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/difficulty_medium" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipHard"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/difficulty_hard" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sezione: Ingredienti (lista strutturata con catalogo a tendina) -->
+        <TextView
+            style="@style/TavolaEditorSection"
+            android:text="@string/ingredients" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/TavolaEditorCard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingVertical="2dp" />
+
+                <TextView
+                    android:id="@+id/textNoIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="4dp"
+                    android:text="@string/editor_no_ingredients"
+                    android:textColor="@color/tavola_muted"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonAddIngredient"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/editor_add_ingredient"
+                    app:icon="@drawable/ic_add" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Sezione: Procedimento -->
+        <TextView
+            style="@style/TavolaEditorSection"
+            android:text="@string/steps" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/TavolaEditorCard">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/recipe_prep_time_hint">
+                android:padding="14dp"
+                app:helperText="@string/recipe_steps_helper"
+                android:hint="@string/recipe_steps_hint">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editPrepTime"
+                    android:id="@+id/editSteps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
+                    android:gravity="top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/recipe_difficulty"
-            android:textAppearance="?attr/textAppearanceLabelLarge" />
+        <!-- Sezione: Pubblicazione -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/TavolaEditorCard">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupDifficulty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipEasy"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPublic"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="@string/difficulty_easy" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipMedium"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/difficulty_medium" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipHard"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/difficulty_hard" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:helperText="@string/recipe_ingredients_helper"
-            android:hint="@string/recipe_ingredients_hint">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editIngredients"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="top"
-                android:inputType="textMultiLine|textCapSentences"
-                android:minLines="3" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:helperText="@string/recipe_steps_helper"
-            android:hint="@string/recipe_steps_hint">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editSteps"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="top"
-                android:inputType="textMultiLine|textCapSentences"
-                android:minLines="3" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchPublic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:checked="true"
-            android:text="@string/recipe_public" />
+                android:padding="16dp"
+                android:text="@string/recipe_public"
+                android:textColor="@color/tavola_ink" />
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSave"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/recipe_save" />
+            android:layout_height="54dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/recipe_save"
+            app:backgroundTint="@color/tavola_accent"
+            app:cornerRadius="16dp"
+            android:textColor="@color/white" />
 
         <ProgressBar
             android:id="@+id/progress"
