@@ -77,6 +77,7 @@ class PantryFragment : Fragment() {
                 Barcode.FORMAT_UPC_A,
                 Barcode.FORMAT_UPC_E,
                 Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_CODE_128,
             )
             .build()
         GmsBarcodeScanning.getClient(requireContext(), options).startScan()
@@ -93,7 +94,10 @@ class PantryFragment : Fragment() {
     private fun onScanResult(result: PantryViewModel.ScanResult) {
         when (result) {
             is PantryViewModel.ScanResult.Found ->
-                showItemDialog(prefillName = result.name.replaceFirstChar { it.uppercase() })
+                showItemDialog(
+                    prefillName = result.name.replaceFirstChar { it.uppercase() },
+                    prefillHelper = result.helper?.let { getString(R.string.scan_product_helper, it) },
+                )
             is PantryViewModel.ScanResult.NotFound -> {
                 Snackbar.make(
                     binding.root,
@@ -127,7 +131,11 @@ class PantryFragment : Fragment() {
      * Dialog condiviso per aggiungere un nuovo ingrediente ([existing] null) o
      * modificarne uno esistente (campi pre-compilati).
      */
-    private fun showItemDialog(existing: PantryItem? = null, prefillName: String? = null) {
+    private fun showItemDialog(
+        existing: PantryItem? = null,
+        prefillName: String? = null,
+        prefillHelper: String? = null,
+    ) {
         val dialogBinding = DialogAddIngredientBinding.inflate(layoutInflater)
 
         // Unità: menu a tendina con valori predefiniti (non digitabile).
@@ -151,6 +159,9 @@ class PantryFragment : Fragment() {
         // Nome pre-compilato dal codice a barre (solo in aggiunta, non in modifica).
         if (existing == null && !prefillName.isNullOrBlank()) {
             dialogBinding.editName.setText(prefillName, false)
+            if (!prefillHelper.isNullOrBlank()) {
+                dialogBinding.inputName.helperText = prefillHelper
+            }
         }
         val isEdit = existing != null
         MaterialAlertDialogBuilder(requireContext())

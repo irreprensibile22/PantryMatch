@@ -19,6 +19,7 @@
     <string name="pantry_add">Aggiungi ingrediente</string>
     <string name="pantry_scan">Scansiona codice a barre</string>
     <string name="scan_not_found">Prodotto non trovato (codice %s). Inserisci il nome manualmente.</string>
+    <string name="scan_product_helper">Prodotto: %s</string>
     <string name="scan_error">Errore di rete durante la ricerca del prodotto.</string>
     <plurals name="pantry_count">
         <item quantity="one">%d ingrediente disponibile</item>

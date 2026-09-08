@@ -20,10 +20,17 @@ class PantryViewModel(
     private val productLookup: ProductLookupRepository = ProductLookupRepository(),
 ) : ViewModel() {
 
-    /** Esito della risoluzione di un codice a barre in un nome prodotto. */
+    /** Esito della risoluzione di un codice a barre in un prodotto. */
     sealed interface ScanResult {
-        /** Prodotto riconosciuto: [name] è pronto (già normalizzato) per il dialog. */
-        data class Found(val name: String) : ScanResult
+        /**
+         * Prodotto riconosciuto.
+         *
+         * @param name   valore da pre-compilare nel campo nome (la categoria se
+         *               disponibile, altrimenti il nome commerciale).
+         * @param helper testo di aiuto sotto il campo (di norma il nome
+         *               commerciale), oppure null se non c'è nulla da mostrare.
+         */
+        data class Found(val name: String, val helper: String?) : ScanResult
         /** Codice letto ma non presente nel database Open Food Facts. */
         data class NotFound(val barcode: String) : ScanResult
         /** Errore di rete durante il lookup. */
@@ -40,20 +47,37 @@ class PantryViewModel(
     private val _scanResult = MutableSharedFlow<ScanResult>(extraBufferCapacity = 1)
     val scanResult: SharedFlow<ScanResult> = _scanResult.asSharedFlow()
 
-    /** Risolve il codice a barre scansionato nel nome del prodotto. */
+    /** Risolve il codice a barre scansionato nelle info del prodotto. */
     fun lookupBarcode(barcode: String) {
         _scanning.value = true
         viewModelScope.launch {
-            val result = runCatching { productLookup.lookupName(barcode) }
+            val result = runCatching { productLookup.lookup(barcode) }
                 .fold(
-                    onSuccess = { name ->
-                        if (name != null) ScanResult.Found(IngredientMatcher.normalize(name))
-                        else ScanResult.NotFound(barcode)
-                    },
+                    onSuccess = { info -> info.toScanResult(barcode) },
                     onFailure = { ScanResult.Error },
                 )
             _scanning.value = false
             _scanResult.emit(result)
+        }
+    }
+
+    /**
+     * Preferisce la **categoria** come nome (più vicina a un ingrediente per il
+     * matching) e mostra il nome commerciale come aiuto. Se manca la categoria,
+     * usa il nome commerciale nel campo. Se manca tutto, è un NotFound.
+     */
+    private fun ProductLookupRepository.ProductInfo?.toScanResult(barcode: String): ScanResult {
+        if (this == null) return ScanResult.NotFound(barcode)
+        return when {
+            category != null -> ScanResult.Found(
+                name = IngredientMatcher.normalize(category),
+                helper = name,
+            )
+            name != null -> ScanResult.Found(
+                name = IngredientMatcher.normalize(name),
+                helper = null,
+            )
+            else -> ScanResult.NotFound(barcode)
         }
     }
 

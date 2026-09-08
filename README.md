@@ -26,7 +26,7 @@ app/src/main/java/com/example/esamemobile/
  ├─ MainActivity.kt              # single-activity: Toolbar + BottomNav + NavHost + sessione
  ├─ data/
  │   ├─ model/                   # Recipe, RecipeIngredient, PantryItem, UserProfile, RecipeMatch, Friend
- │   └─ repository/              # Auth, Pantry, Recipe (+Storage), Friends, Favorites
+ │   └─ repository/              # Auth, Pantry, Recipe (+Storage), Friends, Favorites, ProductLookup (Open Food Facts)
  ├─ ui/
  │   ├─ auth/                    # Login (+Google), Register, AuthViewModel
  │   ├─ pantry/                  # Dispensa: Fragment, ViewModel, Adapter
@@ -180,6 +180,29 @@ Costruzione incrementale, uno step alla volta (ogni step compila):
 
 ### Migliorie
 
+- ✅ **Dispensa — inserimento tramite codice a barre (fotocamera + API esterna)**:
+  nella Dispensa un **mini-FAB "scansiona"** (in basso a sinistra, opposto al FAB
+  "Aggiungi") apre lo scanner di **ML Kit** via *Google code scanner*
+  (`play-services-code-scanner`): UI di scansione pronta di Google Play Services,
+  **senza permesso `CAMERA`** nel manifest (lo scanner gira in un processo
+  separato). Il codice letto (EAN-13/EAN-8/UPC-A/UPC-E/QR/Code 128) viene risolto
+  interrogando l'**API pubblica e gratuita Open Food Facts**
+  (`ProductLookupRepository`, `HttpURLConnection` + `org.json`, nessuna dipendenza
+  HTTP extra). Il lookup restituisce **nome commerciale** (`product_name_it`/
+  `product_name`) **e categoria** (ultima voce `en:` di `categories_tags`,
+  ripulita): dato che la categoria è più vicina a un ingrediente utile al
+  matching, il dialog **"Aggiungi ingrediente" pre-compila il campo nome con la
+  categoria** (passata per `IngredientMatcher.normalize()`) e mostra il **nome
+  commerciale come testo di aiuto** ("Prodotto: …") sotto il campo; entrambi
+  restano editabili, così l'utente corregge se la categoria non va bene (spesso è
+  in inglese perché Open Food Facts non fornisce l'italiano in modo affidabile).
+  Se manca la categoria si usa il nome commerciale nel campo.
+  `PantryViewModel.lookupBarcode()` espone l'esito come evento one-shot
+  (`SharedFlow`): *Found* (dialog pre-compilato nome + helper), *NotFound* (avviso
+  + dialog vuoto), *Error* (avviso rete). Copre due voci **Extra** (fotocamera +
+  API esterna). _Nota: lo scanner richiede Google Play Services; su emulatore la
+  lettura funziona solo iniettando un'immagine nella scena virtuale — meglio
+  testare su dispositivo fisico._
 - ✅ **Login e Registrazione in stile "Tavola"**: le schermate di accesso e
   registrazione adottano il look editoriale crema come il resto dell'app. Entrambe
   (`fragment_login`/`fragment_register`) sono scrollabili su fondo `tavola_bg`, con
