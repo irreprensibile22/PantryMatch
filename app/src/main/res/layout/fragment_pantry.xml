@@ -96,6 +96,19 @@
             android:visibility="gone" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabScan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="28dp"
+            android:layout_marginBottom="20dp"
+            android:contentDescription="@string/pantry_scan"
+            android:src="@drawable/ic_barcode"
+            app:backgroundTint="@color/tavola_accent"
+            app:fabSize="mini"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

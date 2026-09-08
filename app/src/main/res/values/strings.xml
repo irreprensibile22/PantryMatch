@@ -17,6 +17,9 @@
     <string name="pantry_title">La tua dispensa</string>
     <string name="pantry_empty">La tua dispensa è vuota.\nAggiungi gli ingredienti che hai.</string>
     <string name="pantry_add">Aggiungi ingrediente</string>
+    <string name="pantry_scan">Scansiona codice a barre</string>
+    <string name="scan_not_found">Prodotto non trovato (codice %s). Inserisci il nome manualmente.</string>
+    <string name="scan_error">Errore di rete durante la ricerca del prodotto.</string>
     <plurals name="pantry_count">
         <item quantity="one">%d ingrediente disponibile</item>
         <item quantity="other">%d ingredienti disponibili</item>

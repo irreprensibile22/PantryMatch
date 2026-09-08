@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.play.services.auth)
+    // Scansione codici a barre (ML Kit via Google code scanner, nessun permesso CAMERA)
+    implementation(libs.play.services.code.scanner)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

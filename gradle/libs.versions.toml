@@ -19,6 +19,7 @@ glide = "4.16.0"
 workmanager = "2.10.1"
 firebaseBom = "34.0.0"
 playServicesAuth = "21.2.0"
+playServicesCodeScanner = "16.1.0"
 googleServices = "4.4.2"
 coreSplashscreen = "1.0.1"
 
@@ -56,6 +57,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+play-services-code-scanner = { group = "com.google.android.gms", name = "play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
