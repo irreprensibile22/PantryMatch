@@ -10,7 +10,7 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.databinding.ItemRecipeGridBinding
 
-/** Griglia compatta di ricette (schermata "Vedi tutte"). */
+// Card compatte per la griglia "Vedi tutte" (2 colonne).
 class RecipeGridAdapter(
     private val onClick: (Recipe) -> Unit,
 ) : ListAdapter<Recipe, RecipeGridAdapter.VH>(DIFF) {

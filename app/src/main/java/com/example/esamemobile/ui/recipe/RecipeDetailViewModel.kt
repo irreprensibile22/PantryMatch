@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+// Stato del dettaglio ricetta: dati, flag preferito ed esito eliminazione.
 class RecipeDetailViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
     private val favorites: FavoritesRepository = FavoritesRepository(),
@@ -24,7 +25,6 @@ class RecipeDetailViewModel(
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
 
-    // null finché l'utente non avvia un'eliminazione
     private val _deleteState = MutableStateFlow<Resource<Unit>?>(null)
     val deleteState: StateFlow<Resource<Unit>?> = _deleteState.asStateFlow()
 
@@ -48,7 +48,7 @@ class RecipeDetailViewModel(
         }
     }
 
-    /** True se la ricetta appartiene all'utente loggato (mostra modifica/elimina). */
+    // solo l'autore vede le azioni modifica/elimina
     fun isAuthor(recipe: Recipe): Boolean {
         val uid = authRepository.currentUid
         return uid != null && recipe.authorId == uid
@@ -56,11 +56,12 @@ class RecipeDetailViewModel(
 
     fun toggleFavorite() {
         if (recipeId.isEmpty()) return
+        // aggiorno subito l'icona (ottimista) e la ripristino se la scrittura fallisce
         val target = !_isFavorite.value
-        _isFavorite.value = target // aggiornamento ottimista
+        _isFavorite.value = target
         viewModelScope.launch {
             runCatching { favorites.setFavorite(recipeId, target) }
-                .onFailure { _isFavorite.value = !target } // rollback se fallisce
+                .onFailure { _isFavorite.value = !target }
         }
     }
 

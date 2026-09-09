@@ -27,11 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/**
- * Dettaglio di una ricetta. Dalla action bar permette di aggiungerla ai
- * preferiti, condividerla (intent di sistema) e — se l'utente ne è l'autore —
- * di modificarla o eliminarla.
- */
+// Dettaglio ricetta con azioni in action bar: preferiti, condivisione ed edita/elimina (solo autore).
 class RecipeDetailFragment : Fragment() {
 
     private var _binding: FragmentRecipeDetailBinding? = null
@@ -97,7 +93,6 @@ class RecipeDetailFragment : Fragment() {
             .into(binding.imageRecipe)
     }
 
-    /** Popola la riga di pillole meta (categoria · tempo · difficoltà), nascondendo le assenti. */
     private fun bindMeta(recipe: Recipe) {
         fun bindPill(view: android.widget.TextView, text: String?) {
             if (text.isNullOrBlank()) {
@@ -137,6 +132,7 @@ class RecipeDetailFragment : Fragment() {
             inflater.inflate(R.menu.menu_recipe_detail, menu)
         }
 
+        // rieseguito ad ogni invalidateOptionsMenu(): adatta le voci a stato ricetta/preferito/autore
         override fun onPrepareMenu(menu: Menu) {
             val recipe = (viewModel.recipe.value as? Resource.Success)?.data
             val loaded = recipe != null
@@ -168,6 +164,7 @@ class RecipeDetailFragment : Fragment() {
         }
     }
 
+    // condivido la ricetta come testo semplice via intent ACTION_SEND
     private fun shareRecipe() {
         val recipe = (viewModel.recipe.value as? Resource.Success)?.data ?: return
         val text = buildString {
@@ -228,7 +225,6 @@ class RecipeDetailFragment : Fragment() {
     }
 
     companion object {
-        /** Chiave del bundle per l'id ricetta (vedi <argument> in nav_graph). */
         const val ARG_RECIPE_ID = "recipeId"
     }
 }

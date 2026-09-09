@@ -11,20 +11,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * Griglia "Vedi tutte" con ricerca testuale. A seconda di [Mode] mostra le ricette
- * pubblicate dall'utente oppure quelle salvate nei preferiti.
- */
+// ViewModel della griglia "Vedi tutte": mostra le proprie ricette oppure i salvati, con ricerca.
 class RecipesGridViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
     private val favoritesRepository: FavoritesRepository = FavoritesRepository(),
 ) : ViewModel() {
 
+    // sorgente della griglia, scelta da chi la apre
     enum class Mode { MINE, SAVED }
 
     private val _recipes = MutableStateFlow<Resource<List<Recipe>>>(Resource.Loading)
     val recipes: StateFlow<Resource<List<Recipe>>> = _recipes.asStateFlow()
 
+    // tengo l'elenco completo e filtro in memoria, cosi la ricerca non rifa la query
     private var all: List<Recipe> = emptyList()
     private var query: String = ""
 

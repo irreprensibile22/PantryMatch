@@ -9,7 +9,7 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Friend
 import com.example.esamemobile.databinding.ItemFriendBinding
 
-/** Lista degli amici già aggiunti, con numero di ricette, apertura e rimozione. */
+// Lista amici: nome, email, conteggio ricette e pulsante rimuovi.
 class FriendsAdapter(
     private val onClick: (Friend) -> Unit,
     private val onRemove: (Friend) -> Unit,
@@ -18,6 +18,7 @@ class FriendsAdapter(
     inner class VH(val binding: ItemFriendBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FriendItem) {
             val friend = item.friend
+            // se manca il nome ripiego sull'email
             val name = friend.displayName.ifBlank { friend.email }
             binding.textName.text = name
             binding.textAvatar.text = name.trim().firstOrNull()?.uppercase() ?: "?"

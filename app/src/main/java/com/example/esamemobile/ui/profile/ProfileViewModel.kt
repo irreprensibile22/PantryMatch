@@ -14,10 +14,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * Gestione account del Profilo: modifica nome, cambio email/password e reset
- * password. Gli esiti sono notificati come eventi one-shot.
- */
+// Profilo: statistiche e gestione account (nome/email/password). Gli esiti sono eventi one-shot.
 class ProfileViewModel(
     private val auth: AuthRepository = AuthRepository(),
     private val recipeRepository: RecipeRepository = RecipeRepository(),
@@ -25,13 +22,11 @@ class ProfileViewModel(
     private val friendsRepository: FriendsRepository = FriendsRepository(),
 ) : ViewModel() {
 
-    /** Conteggi mostrati nelle statistiche del profilo. */
     data class Stats(val recipes: Int = 0, val saved: Int = 0, val friends: Int = 0)
 
     private val _stats = MutableStateFlow(Stats())
     val stats: StateFlow<Stats> = _stats.asStateFlow()
 
-    /** Carica (best-effort) i conteggi: ricette pubblicate, salvate e amici. */
     fun loadStats() {
         viewModelScope.launch {
             val recipes = runCatching { recipeRepository.getMyRecipes().size }.getOrDefault(0)
@@ -51,6 +46,7 @@ class ProfileViewModel(
         data class Error(val message: String) : Event
     }
 
+    // eventi one-shot (dialog/Toast): SharedFlow per non riproporli dopo una rotazione
     private val _events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
     val events: SharedFlow<Event> = _events.asSharedFlow()
 
@@ -76,10 +72,6 @@ class ProfileViewModel(
         _events.emit(Event.PasswordResetSent(email))
     }
 
-    /**
-     * Riallinea (best-effort) l'email del profilo dopo la verifica del cambio.
-     * Eventuali errori (es. offline) sono ignorati: si riproverà al rientro.
-     */
     fun reconcileEmail() {
         viewModelScope.launch {
             runCatching { auth.reconcileEmail() }.onSuccess { result ->
@@ -94,6 +86,7 @@ class ProfileViewModel(
         }
     }
 
+    // helper: esegue block e, in caso di errore, emette un Event.Error con messaggio di fallback
     private fun launchCatching(fallback: String, block: suspend () -> Unit) {
         viewModelScope.launch {
             runCatching { block() }

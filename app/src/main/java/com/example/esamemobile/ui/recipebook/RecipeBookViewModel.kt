@@ -14,10 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * Stato del "Ricettario": le ricette pubblicate dall'utente ("Le mie ricette") e
- * il ricettario salvato dai preferiti. Separato dalla logica del Profilo.
- */
+// Ricettario: due liste separate, "Le mie ricette" e i "Salvati" (preferiti annotati sulla dispensa).
 class RecipeBookViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
     private val favoritesRepository: FavoritesRepository = FavoritesRepository(),
@@ -41,11 +38,11 @@ class RecipeBookViewModel(
         }
     }
 
-    /** Ricettario personale: le ricette salvate nei preferiti, annotate sulla dispensa. */
     fun loadFavorites() {
         _favorites.value = Resource.Loading
         viewModelScope.launch {
             _favorites.value = runCatching {
+                // dagli id dei preferiti recupero le ricette e le annoto col match sulla dispensa
                 val ids = favoritesRepository.getFavoriteIds()
                 val recipes = repository.getRecipesByIds(ids)
                 val pantry = pantryRepository.getPantry()
@@ -57,7 +54,6 @@ class RecipeBookViewModel(
         }
     }
 
-    /** Rimuove una ricetta dai preferiti e ricarica l'elenco. */
     fun removeFavorite(recipeId: String) {
         viewModelScope.launch {
             runCatching { favoritesRepository.setFavorite(recipeId, false) }

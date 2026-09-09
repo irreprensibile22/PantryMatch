@@ -6,10 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * CRUD sull'inventario (dispensa) dell'utente corrente, salvato nella
- * sub-collection `users/{uid}/pantry`.
- */
+// Dispensa dell'utente su Firestore (users/{uid}/pantry).
 class PantryRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -22,8 +19,8 @@ class PantryRepository {
     suspend fun getPantry(): List<PantryItem> =
         collection().get().await().toObjects(PantryItem::class.java)
 
+    // salvo il nome gia normalizzato, cosi il matching resta coerente senza rinormalizzare ogni volta
     suspend fun addItem(item: PantryItem): String {
-        // Normalizza il nome così da renderlo coerente col matcher
         val normalized = item.copy(name = IngredientMatcher.normalize(item.name))
         val ref = collection().document()
         ref.set(normalized).await()
@@ -32,7 +29,6 @@ class PantryRepository {
 
     suspend fun updateItem(item: PantryItem) {
         require(item.id.isNotEmpty()) { "Item senza id" }
-        // Normalizza il nome come in addItem, per coerenza col matcher
         val normalized = item.copy(name = IngredientMatcher.normalize(item.name))
         collection().document(item.id).set(normalized).await()
     }

@@ -1,7 +1,7 @@
 <resources>
+    <!-- Tutte le stringhe UI (in italiano); i plurals gestiscono singolare/plurale di conteggi come ingredienti/ricette. -->
     <string name="app_name">PantryMatch</string>
 
-    <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_pantry">Dispensa</string>
     <string name="nav_search">Cerca</string>
@@ -13,7 +13,6 @@
     <string name="cd_back">Indietro</string>
     <string name="friend_recipes_subtitle">Le ricette pubblicate</string>
 
-    <!-- Pantry -->
     <string name="pantry_title">La tua dispensa</string>
     <string name="pantry_empty">La tua dispensa è vuota.\nAggiungi gli ingredienti che hai.</string>
     <string name="pantry_add">Aggiungi ingrediente</string>
@@ -45,7 +44,6 @@
         <item>q.b.</item>
     </string-array>
 
-    <!-- Search -->
     <string name="search_ready_only">Preparabili</string>
     <string name="search_max_1">Max 1 mancante</string>
     <string name="search_max_2">Max 2 mancanti</string>
@@ -59,7 +57,6 @@
     <string name="filter_apply">Applica</string>
     <string name="filter_reset">Reimposta</string>
 
-    <!-- Categorie ricetta (usate sia nell'editor sia nei filtri) -->
     <string-array name="recipe_categories">
         <item>Antipasto</item>
         <item>Primo</item>
@@ -75,12 +72,10 @@
         <item quantity="other">Mancano %d ingredienti</item>
     </plurals>
 
-    <!-- Recipe -->
     <string name="ingredients">Ingredienti</string>
     <string name="steps">Preparazione</string>
     <string name="recipe_image">Immagine ricetta</string>
 
-    <!-- Dettaglio ricetta: azioni -->
     <string name="detail_favorite_add">Aggiungi ai preferiti</string>
     <string name="detail_favorite_remove">Rimuovi dai preferiti</string>
     <string name="detail_favorite_added">Aggiunta ai preferiti</string>
@@ -94,7 +89,6 @@
     <string name="cancel">Annulla</string>
     <string name="by_author">di %1$s</string>
 
-    <!-- Friends -->
     <string name="friends_search_hint">Cerca un utente per email</string>
     <string name="friends_my_friends">I tuoi amici</string>
     <string name="friends_subtitle">Scopri le ricette di chi cucina con te</string>
@@ -108,7 +102,6 @@
         <item quantity="other">%d ricette pubblicate</item>
     </plurals>
 
-    <!-- Profile / Auth -->
     <string name="profile">Profilo</string>
     <string name="logout">Esci</string>
     <string name="login">Accedi</string>
@@ -117,7 +110,6 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
 
-    <!-- Ricettario -->
     <string name="recipe_book_title">Il tuo ricettario</string>
     <string name="recipe_book_tab_mine">Le mie ricette</string>
     <string name="recipe_book_tab_saved">Salvati</string>
@@ -128,7 +120,6 @@
         <item quantity="other">%d ingredienti</item>
     </plurals>
 
-    <!-- Profilo: gestione account -->
     <string name="profile_account">Account</string>
     <string name="profile_preferences">Preferenze</string>
     <string name="profile_notifications">Notifiche</string>
@@ -156,7 +147,6 @@
     <string name="profile_reset_password_sent">Email di reimpostazione inviata a %1$s.</string>
     <string name="profile_email_updated">Email aggiornata.</string>
 
-    <!-- Registrazione -->
     <string name="register_title">Crea account</string>
     <string name="register_subtitle">Unisciti alla community e condividi le tue ricette.</string>
     <string name="register_action">Registrati</string>
@@ -167,16 +157,14 @@
     <string name="confirm_password">Conferma password</string>
     <string name="go_to_register">Non hai un account? Registrati</string>
 
-    <!-- Google Sign-In -->
     <string name="login_google">Accedi con Google</string>
     <string name="login_google_error">Accesso con Google non riuscito.</string>
 
-    <!-- Editor ricetta -->
     <string name="nav_recipe_edit">Nuova ricetta</string>
     <string name="editor_section_details">Dettagli</string>
     <string name="editor_add_ingredient">Aggiungi ingrediente</string>
     <string name="editor_no_ingredients">Nessun ingrediente aggiunto.</string>
-    <!-- Dialog ingrediente (Dispensa / Editor) -->
+    
     <string name="ingredient_dialog_add_title">Aggiungi ingrediente</string>
     <string name="ingredient_dialog_edit_title">Modifica ingrediente</string>
     <string name="ingredient_dialog_add">Aggiungi</string>
@@ -202,7 +190,6 @@
     <string name="recipe_visibility_public">Pubblica</string>
     <string name="recipe_visibility_private">Privata</string>
 
-    <!-- Profilo: le mie ricette -->
     <string name="profile_guest">Ospite</string>
     <string name="profile_my_recipes">Le mie ricette</string>
     <string name="profile_no_recipes">Non hai ancora pubblicato ricette.</string>
@@ -213,7 +200,6 @@
     <string name="search_no_results">Nessun risultato per la ricerca.</string>
     <string name="profile_add_recipe">Aggiungi ricetta</string>
 
-    <!-- Notifiche / background (Step 7) -->
     <string name="notif_channel_name">Suggerimenti dispensa</string>
     <string name="notif_channel_desc">Notifica periodica sulle ricette che puoi preparare con la tua dispensa.</string>
     <string name="notif_pantry_title">PantryMatch</string>

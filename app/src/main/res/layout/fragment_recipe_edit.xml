@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Editor "Nuova ricetta / Modifica" in stile editoriale "Tavola": fondo crema,
-     sezioni serif, campi in card morbide, foto con angoli arrotondati. La toolbar
-     globale resta (back + titolo). -->
+<!-- Editor crea/modifica ricetta, con foto in card e sezioni serif. -->
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -17,7 +16,6 @@
         android:paddingTop="18dp"
         android:paddingBottom="28dp">
 
-        <!-- Foto della ricetta -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +54,6 @@
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sezione: Dettagli -->
         <TextView
             style="@style/TavolaEditorSection"
             android:text="@string/editor_section_details" />
@@ -179,7 +176,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sezione: Ingredienti (lista strutturata con catalogo a tendina) -->
         <TextView
             style="@style/TavolaEditorSection"
             android:text="@string/ingredients" />
@@ -219,7 +215,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sezione: Procedimento -->
         <TextView
             style="@style/TavolaEditorSection"
             android:text="@string/steps" />
@@ -245,7 +240,6 @@
             </com.google.android.material.textfield.TextInputLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sezione: Pubblicazione -->
         <com.google.android.material.card.MaterialCardView
             style="@style/TavolaEditorCard">
 

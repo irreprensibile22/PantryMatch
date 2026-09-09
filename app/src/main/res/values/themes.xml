@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Tema base: Material 3 con schema colore arancione. I @color/md_* sono
-         risolti per configurazione (values / values-night). -->
+
+    <!-- Tema base: mappa i token colore "Tavola" sugli attributi Material 3, cosi le view che usano
+         gli attributi del tema si adattano da sole. L'app e comunque forzata in chiaro da MainActivity. -->
     <style name="Base.Theme.ESAMEMOBILE" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_primary</item>
         <item name="colorOnPrimary">@color/md_on_primary</item>
@@ -24,8 +25,7 @@
         <item name="colorOnErrorContainer">@color/md_on_error_container</item>
 
         <item name="android:colorBackground">@color/md_background</item>
-        <!-- Sfondo finestra esplicito: dopo lo splash (postSplashScreenTheme) la
-             finestra deve dipingere crema, non nero. -->
+
         <item name="android:windowBackground">@color/md_background</item>
         <item name="colorOnBackground">@color/md_on_background</item>
         <item name="colorSurface">@color/md_surface</item>
@@ -41,15 +41,14 @@
 
     <style name="Theme.ESAMEMOBILE" parent="Base.Theme.ESAMEMOBILE" />
 
-    <!-- Splash screen (Android 12+ via androidx core-splashscreen): sfondo crema
-         "Tavola" + logo dedicato dell'app. Al termine passa al tema principale. -->
+    <!-- Tema di lancio (splash): dopo lo splash passa a Theme.ESAMEMOBILE via postSplashScreenTheme. -->
     <style name="Theme.ESAMEMOBILE.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.ESAMEMOBILE</item>
     </style>
 
-    <!-- Bottom nav stile "Tavola": niente pillola indicatore, solo icona/label colorate. -->
+    <!-- indicatore della bottom bar azzerato: il look Tavola non usa la pillola sotto la voce attiva -->
     <style name="TavolaNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:width">0dp</item>
         <item name="android:height">0dp</item>

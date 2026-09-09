@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+// ViewModel della Home: feed community annotato col match sulla dispensa, piu filtri e preferiti.
 class SearchViewModel(
     private val recipeRepository: RecipeRepository = RecipeRepository(),
     private val pantryRepository: PantryRepository = PantryRepository(),
@@ -25,11 +26,9 @@ class SearchViewModel(
     private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
     val favoriteIds: StateFlow<Set<String>> = _favoriteIds.asStateFlow()
 
-    /** Filtro ingredienti mancanti: null = tutte; 0 = preparabili; 1/2 = mancanti ammessi. */
     var maxMissing: Int? = null
         private set
 
-    /** Filtro categoria piatto (es. "Primo", "Dolce"); null = tutte le categorie. */
     var category: String? = null
         private set
 
@@ -38,18 +37,12 @@ class SearchViewModel(
         loadFavorites()
     }
 
-    /** Applica i filtri scelti nel dialog e ricarica. */
     fun setFilters(maxMissing: Int?, category: String?) {
         this.maxMissing = maxMissing
         this.category = category
         load()
     }
 
-    /**
-     * Carica le ricette della community applicando i filtri attivi: prima la
-     * categoria, poi il vincolo sugli ingredienti mancanti (senza vincolo le
-     * mostra tutte, annotate sulla dispensa per i badge).
-     */
     fun load() {
         _results.value = Resource.Loading
         viewModelScope.launch {
@@ -59,6 +52,7 @@ class SearchViewModel(
                 category?.let { cat ->
                     recipes = recipes.filter { it.category.equals(cat, ignoreCase = true) }
                 }
+                // senza filtro mostro tutto il feed (annotate); con filtro scarto oltre mm mancanti (match)
                 val mm = maxMissing
                 if (mm == null) IngredientMatcher.annotate(pantry, recipes)
                 else IngredientMatcher.match(pantry, recipes, mm)
@@ -69,7 +63,6 @@ class SearchViewModel(
         }
     }
 
-    /** Aggiorna l'insieme degli id preferiti (cuore pieno/vuoto nel feed). */
     fun loadFavorites() {
         viewModelScope.launch {
             _favoriteIds.value =
@@ -77,10 +70,10 @@ class SearchViewModel(
         }
     }
 
-    /** Salva/rimuove rapidamente dal feed, con aggiornamento ottimista. */
     fun toggleFavorite(match: RecipeMatch, favorite: Boolean) {
         val id = match.recipe.id
         if (id.isEmpty()) return
+        // aggiorno subito la UI (ottimista) e, se la scrittura fallisce, ripristino lo stato
         _favoriteIds.value =
             if (favorite) _favoriteIds.value + id else _favoriteIds.value - id
         viewModelScope.launch {

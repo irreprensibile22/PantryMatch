@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.esamemobile.data.model.UserProfile
 import com.example.esamemobile.databinding.ItemUserSearchBinding
 
-/** Risultati della ricerca utenti per email, con azione "aggiungi amico". */
+// Risultati della ricerca utenti per email, con pulsante "+" per aggiungerli agli amici.
 class UserSearchAdapter(
     private val onAdd: (UserProfile) -> Unit,
 ) : ListAdapter<UserProfile, UserSearchAdapter.VH>(DIFF) {

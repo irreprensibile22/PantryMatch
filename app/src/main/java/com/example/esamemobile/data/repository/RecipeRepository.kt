@@ -11,13 +11,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
-/**
- * CRUD sulle ricette (collezione `recipes`) e ricerca per ingredienti.
- *
- * La ricerca pre-filtra lato server con `whereArrayContainsAny` sul campo
- * denormalizzato `ingredientNames` (max 30 valori), poi rifinisce il match
- * lato client con [IngredientMatcher] per applicare il vincolo sui mancanti.
- */
+// CRUD delle ricette su Firestore + upload foto su Storage.
 class RecipeRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -28,10 +22,6 @@ class RecipeRepository {
     suspend fun getRecipe(id: String): Recipe? =
         recipes().document(id).get().await().toObject(Recipe::class.java)
 
-    /**
-     * Carica le ricette con gli [ids] indicati, **preservandone l'ordine** e
-     * scartando quelle non più esistenti. Usato per il ricettario dei preferiti.
-     */
     suspend fun getRecipesByIds(ids: List<String>): List<Recipe> =
         ids.mapNotNull { getRecipe(it) }
 
@@ -42,15 +32,8 @@ class RecipeRepository {
             .get().await()
             .toObjects(Recipe::class.java)
 
-    /**
-     * Ricette **pubbliche** di un autore, dalla più recente.
-     *
-     * Il filtro `isPublic == true` è **server-side** (non solo client): le
-     * Security Rules consentono a un altro utente di leggere una ricetta solo se
-     * pubblica, perciò una query che non vincola `isPublic` verrebbe rifiutata
-     * con *permission denied*. Due filtri di sola uguaglianza non richiedono un
-     * indice composito; l'ordinamento per data resta lato client.
-     */
+    // il vincolo isPublic e obbligatorio: le Security Rules vietano di leggere ricette altrui non pubbliche,
+    // quindi senza di esso Firestore rifiuterebbe l'intera query. Ordino lato client per non usare un indice.
     suspend fun getPublicRecipesByAuthor(authorId: String): List<Recipe> =
         recipes()
             .whereEqualTo("authorId", authorId)
@@ -60,11 +43,13 @@ class RecipeRepository {
             .sortedByDescending { it.createdAt }
 
     suspend fun saveRecipe(recipe: Recipe): String {
+        // autore e nomi normalizzati calcolati qui, cosi la UI non deve pensarci
         val withMeta = recipe.copy(
             authorId = requireUid(),
             authorName = auth.currentUser?.displayName.orEmpty(),
             ingredientNames = IngredientMatcher.ingredientNamesFor(recipe),
         )
+        // id vuoto = nuova ricetta (lascio generare l'id a Firestore), altrimenti sovrascrivo
         return if (withMeta.id.isEmpty()) {
             val ref = recipes().document()
             ref.set(withMeta).await()
@@ -79,10 +64,6 @@ class RecipeRepository {
         recipes().document(id).delete().await()
     }
 
-    /**
-     * Carica un'immagine di ricetta su Firebase Storage e restituisce l'URL di
-     * download pubblico, da salvare nel campo `imageUrl` della ricetta.
-     */
     suspend fun uploadImage(localUri: Uri): String {
         val ref = storage.reference
             .child("recipe_images")
@@ -92,14 +73,7 @@ class RecipeRepository {
         return ref.downloadUrl.await().toString()
     }
 
-    /**
-     * Feed della Home: tutte le ricette pubbliche, ordinate dalla più recente.
-     *
-     * L'ordinamento per `createdAt` è applicato lato client per non richiedere
-     * un ulteriore indice composito `isPublic` + `createdAt` su Firestore.
-     *
-     * @param authorIds se non null, limita agli autori indicati (es. amici).
-     */
+    // feed della Home: solo filtro di uguaglianza (niente indice composito), ordinamento lato client
     suspend fun getFeed(authorIds: List<String>? = null): List<Recipe> {
         if (authorIds != null && authorIds.isEmpty()) return emptyList()
         var recipes = recipes()
@@ -113,13 +87,6 @@ class RecipeRepository {
         return recipes.sortedByDescending { it.createdAt }
     }
 
-    /**
-     * Cerca le ricette pubbliche realizzabili con l'inventario [pantry],
-     * ammettendo fino a [maxMissing] ingredienti mancanti.
-     *
-     * @param authorIds se non null, limita la ricerca a questi autori
-     *                  (es. la lista degli amici).
-     */
     suspend fun searchByPantry(
         pantry: List<PantryItem>,
         maxMissing: Int,
@@ -129,9 +96,7 @@ class RecipeRepository {
         if (owned.isEmpty()) return emptyList()
         if (authorIds != null && authorIds.isEmpty()) return emptyList()
 
-        // Pre-filtro server-side sugli ingredienti (arrayContainsAny, max 30 valori).
-        // Il filtro per autore (amici) è applicato lato client: Firestore non
-        // permette di combinare arrayContainsAny e whereIn nella stessa query.
+        // Firestore limita arrayContainsAny a 30 valori: prendo i primi 30 ingredienti della dispensa
         val query: Query = recipes()
             .whereEqualTo("isPublic", true)
             .whereArrayContainsAny("ingredientNames", owned.take(30))

@@ -17,10 +17,7 @@ import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/**
- * Registrazione con email/password. Riusa [AuthViewModel] (metodo `register`)
- * e, al successo, entra direttamente nell'app svuotando lo stack di login.
- */
+// Schermata di registrazione con email/password e validazione dei campi lato client.
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
@@ -42,6 +39,7 @@ class RegisterFragment : Fragment() {
             val password = binding.editPassword.text?.toString().orEmpty()
             val confirm = binding.editPasswordConfirm.text?.toString().orEmpty()
 
+            // valido prima di chiamare Firebase (password minima 6 caratteri, come richiede Firebase)
             val error = when {
                 name.isEmpty() || email.isEmpty() || password.length < 6 ->
                     getString(R.string.register_invalid)

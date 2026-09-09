@@ -23,5 +23,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ESAME MOBILE"
-include(":app")
- 
+include(":app") // unico modulo del progetto

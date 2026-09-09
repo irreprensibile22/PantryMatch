@@ -20,7 +20,7 @@ import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/** Elenco delle ricette pubblicate da un amico (aperto dalla schermata Amici). */
+// Elenco delle ricette di un amico; riceve authorId/authorName come argomenti di navigazione.
 class FriendRecipesFragment : Fragment() {
 
     private var _binding: FragmentFriendRecipesBinding? = null

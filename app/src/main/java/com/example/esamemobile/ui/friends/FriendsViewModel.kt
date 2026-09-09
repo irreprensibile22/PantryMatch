@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+// Lista amici (con conteggio ricette pubbliche) e ricerca utenti per email.
 class FriendsViewModel(
     private val repository: FriendsRepository = FriendsRepository(),
     private val recipeRepository: RecipeRepository = RecipeRepository(),
@@ -27,6 +28,7 @@ class FriendsViewModel(
         viewModelScope.launch {
             _friends.value = runCatching {
                 repository.getFriends().map { friend ->
+                    // per ogni amico conto le sue ricette pubbliche; se fallisce mostro 0 senza rompere la lista
                     val count = runCatching {
                         recipeRepository.getPublicRecipesByAuthor(friend.uid).size
                     }.getOrDefault(0)

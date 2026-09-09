@@ -24,12 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/**
- * Profilo dell'utente: hero (avatar, nome, email), statistiche (ricette/salvate/
- * amici), gestione account (modifica nome, cambio email/password, reset password),
- * preferenza notifiche e logout. Le ricette pubblicate/preferite sono nel
- * Ricettario (RecipeBookFragment).
- */
+// Profilo: dati utente, statistiche, gestione account, toggle notifiche e logout.
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
@@ -65,7 +60,7 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Al rientro: riallinea l'email del profilo e aggiorna i conteggi.
+        // al rientro riallineo l'email (dopo un eventuale cambio confermato) e aggiorno le statistiche
         viewModel.reconcileEmail()
         viewModel.loadStats()
     }
@@ -105,6 +100,7 @@ class ProfileFragment : Fragment() {
 
     private fun setupNotificationsSwitch() {
         binding.switchNotifications.isChecked = SettingsPrefs.notificationsEnabled(requireContext())
+        // salvo la preferenza e pianifico/annullo subito il worker di conseguenza
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             val ctx = requireContext().applicationContext
             SettingsPrefs.setNotificationsEnabled(ctx, isChecked)
@@ -148,6 +144,7 @@ class ProfileFragment : Fragment() {
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.action_save, null)
             .show()
+        // sovrascrivo il click del positive button per validare senza chiudere il dialog in caso di errore
         dialog.positiveButton().setOnClickListener {
             val name = b.editName.text?.toString()?.trim().orEmpty()
             if (name.isEmpty()) {

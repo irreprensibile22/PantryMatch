@@ -1,10 +1,4 @@
-<!--
-  Foreground dell'icona launcher (adaptive-icon): il logo PantryMatch/"Tavola" —
-  una pentola con coperchio, manici, vapore e un check (il "match" dispensa ↔
-  ricette). Tinte chiare (crema) per stagliarsi sullo sfondo terracotta
-  (ic_launcher_background). Il disegno è scalato nella zona sicura dell'icona
-  adattiva (66dp centrali su 108) così non viene tagliato dalle maschere.
--->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -17,7 +11,6 @@
       android:pivotX="60"
       android:pivotY="62">
 
-    <!-- Vapore -->
     <path
         android:pathData="M50,32 q-5,-6 0,-12 q5,-6 0,-12"
         android:strokeColor="#F7E4D4"
@@ -31,7 +24,6 @@
         android:strokeLineCap="round"
         android:fillColor="#00000000" />
 
-    <!-- Manici -->
     <path
         android:pathData="M34,62 q-10,0 -10,9 q0,9 10,9"
         android:strokeColor="#F2D2BC"
@@ -45,22 +37,18 @@
         android:strokeLineCap="round"
         android:fillColor="#00000000" />
 
-    <!-- Corpo della pentola -->
     <path
         android:fillColor="#FFF6EC"
         android:pathData="M30,56 L90,56 L85,90 Q84,96 78,96 L42,96 Q36,96 35,90 Z" />
 
-    <!-- Coperchio -->
     <path
         android:fillColor="#F2D2BC"
         android:pathData="M26,48 L94,48 Q97,48 97,51.5 Q97,57 91,57 L29,57 Q23,57 23,51.5 Q23,48 26,48 Z" />
 
-    <!-- Pomello -->
     <path
         android:fillColor="#F2D2BC"
         android:pathData="M60,38 m-5,0 a5,5 0 1 0 10,0 a5,5 0 1 0 -10,0 Z" />
 
-    <!-- Check "preparabile" (il match) -->
     <path
         android:pathData="M45,75 L55,85 L77,66"
         android:strokeColor="#C8552B"

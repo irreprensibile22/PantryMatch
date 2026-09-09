@@ -28,11 +28,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 
-/**
- * Ricettario dell'utente con due tab: "Le mie ricette" (card con azioni
- * modifica/elimina + FAB di creazione) e "Salvati" (i preferiti dalla community).
- * Separato dalla schermata Profilo.
- */
+// Ricettario a tab "Le mie ricette / Salvati", con ricerca testuale e "Vedi tutte".
 class RecipeBookFragment : Fragment() {
 
     private var _binding: FragmentRecipebookBinding? = null
@@ -51,12 +47,12 @@ class RecipeBookFragment : Fragment() {
         },
     )
 
-    // Dati completi: la ricerca testuale filtra lato client il tab attivo.
     private var allMyRecipes: List<Recipe> = emptyList()
     private var allFavorites: List<RecipeMatch> = emptyList()
     private var myCount = 0
     private var savedCount = 0
     private var hasQuery = false
+    // tab 0 = le mie ricette, tab 1 = salvati
     private val isMineTab get() = binding.tabRecipeBook.selectedTabPosition == 0
 
     override fun onCreateView(
@@ -102,12 +98,12 @@ class RecipeBookFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Ricarica al rientro (es. dopo aver creato una ricetta o aggiunto un preferito)
+        // ricarico al rientro: potrei aver creato/modificato/eliminato una ricetta o cambiato i preferiti
         viewModel.loadMyRecipes()
         viewModel.loadFavorites()
     }
 
-    /** Applica la ricerca testuale (per titolo) a entrambe le liste. */
+    // filtro per titolo lato client su entrambe le liste (una sola barra di ricerca per il tab attivo)
     private fun applyFilter() {
         val q = binding.editSearch.text?.toString()?.trim().orEmpty()
         hasQuery = q.isNotEmpty()
@@ -122,7 +118,6 @@ class RecipeBookFragment : Fragment() {
         updateTab()
     }
 
-    /** Mostra la lista del tab attivo, aggiorna sottotitolo, FAB e stati vuoti. */
     private fun updateTab() {
         val mine = isMineTab
         binding.textSubtitle.setText(
@@ -159,7 +154,6 @@ class RecipeBookFragment : Fragment() {
             is Resource.Loading -> Unit
             is Resource.Success -> {
                 allFavorites = state.data
-                // Nel ricettario sono tutte preferite: cuori pieni.
                 favoritesAdapter.favoriteIds = state.data.map { it.recipe.id }.toSet()
                 applyFilter()
             }

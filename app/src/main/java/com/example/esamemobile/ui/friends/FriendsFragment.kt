@@ -21,10 +21,7 @@ import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/**
- * Gestione amici: ricerca utenti per email, aggiunta e rimozione. La lista degli
- * amici viene poi usata dalla ricerca ricette (filtro "Solo amici").
- */
+// Schermata Amici: lista amici + ricerca per email (due RecyclerView distinte).
 class FriendsFragment : Fragment() {
 
     private var _binding: FragmentFriendsBinding? = null
@@ -51,6 +48,7 @@ class FriendsFragment : Fragment() {
         val name = runCatching { AuthRepository().currentUser?.displayName }.getOrNull()
         binding.textProfileInitial.text = name?.trim()?.firstOrNull()?.uppercase() ?: "?"
 
+        // cerco quando l'utente preme il tasto "cerca" della tastiera
         binding.editSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.search(binding.editSearch.text?.toString().orEmpty())

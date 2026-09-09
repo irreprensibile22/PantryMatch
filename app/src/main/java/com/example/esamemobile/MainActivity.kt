@@ -27,21 +27,19 @@ import com.example.esamemobile.util.SettingsPrefs
 import com.example.esamemobile.work.PantryMatchScheduler
 import kotlinx.coroutines.launch
 
+// Unica Activity dell'app: ospita Toolbar, BottomNav e il NavHost, e gestisce la sessione all'avvio.
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    // Step 7: richiesta del permesso notifiche (Android 13+); l'esito non blocca l'app.
+    // esito ignorato: se l'utente nega, semplicemente non riceve le notifiche
     private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op */ }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {  }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Splash screen (Android 12+ via androidx): mostra il logo Tavola su sfondo
-        // crema all'avvio, poi passa automaticamente al tema principale dell'app.
-        installSplashScreen()
-        // Il design "Tavola" è chiaro/caldo: forziamo il tema chiaro su tutta l'app
-        // per coerenza (Home/Dispensa/Amici usano comunque la palette crema).
+        installSplashScreen() // va chiamato prima di super.onCreate()
+        // il look "Tavola" e chiaro/caldo: forzo il tema chiaro anche se il sistema e in dark
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -60,7 +58,6 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHost.navController
 
-        // Le 4 destinazioni di primo livello (niente freccia "back", titolo dalla label)
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.pantryFragment, R.id.searchFragment, R.id.friendsFragment,
@@ -70,12 +67,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.bottomNav.setupWithNavController(navController)
 
-        // Nascondi la bottom bar nelle schermate di dettaglio/login
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            // la bottom bar compare solo sulle 5 sezioni principali
             val topLevel = destination.id in appBarConfiguration.topLevelDestinations
             binding.bottomNav.visibility = if (topLevel) View.VISIBLE else View.GONE
-            // Le schermate con header "Tavola" interno (le 5 top-level + le sotto-schermate
-            // a lista, che hanno freccia indietro propria): top bar globale nascosta lì.
+            // queste schermate hanno un header interno "Tavola": nascondo la top bar globale
             val ownHeader = destination.id == R.id.searchFragment ||
                 destination.id == R.id.pantryFragment ||
                 destination.id == R.id.friendsFragment ||
@@ -86,20 +82,18 @@ class MainActivity : AppCompatActivity() {
             binding.appBar.visibility = if (ownHeader) View.GONE else View.VISIBLE
         }
 
-        // Gestione sessione: se non autenticato, parti dal login svuotando il back stack.
         val authRepository = AuthRepository()
         val loggedIn = runCatching { authRepository.isLoggedIn }.getOrDefault(false)
         if (!loggedIn) {
+            // non autenticato: parto dal login svuotando il back stack
             navController.navigate(
                 R.id.loginFragment,
                 null,
                 navOptions { popUpTo(R.id.nav_graph) { inclusive = true } },
             )
         } else {
-            // Se l'utente ha confermato un cambio email mentre era fuori dall'app,
-            // riallinea (best-effort) l'email del profilo Firestore all'avvio. Se la
-            // sessione è stata revocata dal cambio, reindirizza al login.
             lifecycleScope.launch {
+                // riallineo l'email dopo un eventuale cambio; se la sessione e stata revocata torno al login
                 val result = runCatching { authRepository.reconcileEmail() }.getOrNull()
                 if (result is AuthRepository.EmailSync.SessionRevoked) {
                     Toast.makeText(
@@ -114,9 +108,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Step 7: chiedi il permesso notifiche e pianifica il task periodico in
-        // background, salvo che l'utente l'abbia disattivato dal Profilo.
         ensureNotificationPermission()
+        // rispetto la preferenza utente: pianifico o annullo il worker di conseguenza
         if (SettingsPrefs.notificationsEnabled(applicationContext)) {
             PantryMatchScheduler.schedule(applicationContext)
         } else {
@@ -124,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Su Android 13+ il permesso POST_NOTIFICATIONS va richiesto a runtime. */
     private fun ensureNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)

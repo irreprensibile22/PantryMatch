@@ -2,9 +2,7 @@ package com.example.esamemobile.data.model
 
 import com.google.firebase.firestore.DocumentId
 
-/**
- * Un ingrediente presente nell'inventario (dispensa) dell'utente.
- */
+// Voce della dispensa dell'utente (sotto-collezione users/{uid}/pantry).
 data class PantryItem(
     @DocumentId
     val id: String = "",

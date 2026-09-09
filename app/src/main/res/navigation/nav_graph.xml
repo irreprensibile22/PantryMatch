@@ -5,6 +5,8 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/searchFragment">
 
+    <!-- Grafo di navigazione unico: start = Home (searchFragment); login/registrazione svuotano il back stack. -->
+
     <fragment
         android:id="@+id/pantryFragment"
         android:name="com.example.esamemobile.ui.pantry.PantryFragment"
@@ -119,6 +121,7 @@
         android:name="com.example.esamemobile.ui.auth.LoginFragment"
         android:label="@string/login"
         tools:layout="@layout/fragment_login">
+        <!-- dopo il login vado alla Home rimuovendo il login dal back stack (niente ritorno con back) -->
         <action
             android:id="@+id/action_login_to_pantry"
             app:destination="@id/searchFragment"

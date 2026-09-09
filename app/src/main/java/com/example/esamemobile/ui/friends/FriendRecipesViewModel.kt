@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/** Ricette pubbliche di un singolo amico, annotate sulla dispensa dell'utente. */
+// Ricette pubbliche di un amico, annotate col match sulla dispensa (stesse schede della Home).
 class FriendRecipesViewModel(
     private val recipeRepository: RecipeRepository = RecipeRepository(),
     private val pantryRepository: PantryRepository = PantryRepository(),
@@ -50,6 +50,7 @@ class FriendRecipesViewModel(
     fun toggleFavorite(match: RecipeMatch, favorite: Boolean) {
         val id = match.recipe.id
         if (id.isEmpty()) return
+        // update ottimista con rollback in caso di errore
         _favoriteIds.value =
             if (favorite) _favoriteIds.value + id else _favoriteIds.value - id
         viewModelScope.launch {

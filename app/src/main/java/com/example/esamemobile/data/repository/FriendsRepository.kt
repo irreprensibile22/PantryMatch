@@ -6,10 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * Gestisce gli amici dell'utente corrente (sub-collection
- * `users/{uid}/friends`) e la ricerca di altri utenti per email.
- */
+// Amici dell'utente: ricerca per email e gestione della sotto-collezione users/{uid}/friends.
 class FriendsRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -20,14 +17,8 @@ class FriendsRepository {
     suspend fun getFriends(): List<Friend> =
         friendsCollection().get().await().toObjects(Friend::class.java)
 
-    /** Solo gli `uid` degli amici: usata per filtrare la ricerca ricette. */
     suspend fun getFriendIds(): List<String> = getFriends().map { it.uid }
 
-    /**
-     * Cerca utenti per email esatta (case-insensitive). Le email sono salvate in
-     * minuscolo in fase di registrazione, quindi basta una query di uguaglianza.
-     * Esclude sé stessi dai risultati.
-     */
     suspend fun searchUsersByEmail(query: String): List<UserProfile> {
         val email = query.trim().lowercase()
         if (email.isEmpty()) return emptyList()
@@ -36,7 +27,7 @@ class FriendsRepository {
             .limit(10)
             .get().await()
             .toObjects(UserProfile::class.java)
-            .filter { it.uid != requireUid() }
+            .filter { it.uid != requireUid() } // non mostro me stesso tra i risultati
     }
 
     suspend fun addFriend(user: UserProfile) {

@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Catalogo condiviso di ingredienti: alimenta il menu a tendina di suggerimento
-  sia nel dialog della Dispensa sia nell'editor ricetta. Usa forme canoniche
-  (singolare) coerenti con IngredientMatcher.SYNONYMS/normalize(), così da
-  uniformare i nomi ed evitare doppioni tipo "uovo"/"uova". L'utente può comunque
-  digitare un ingrediente non in elenco.
--->
+
 <resources>
+    <!-- Catalogo condiviso di ingredienti (forme canoniche) suggerito nei menu a tendina di Dispensa
+         ed editor ricetta, per uniformare i nomi ed evitare doppioni. Coerente con IngredientMatcher. -->
     <string-array name="ingredient_catalog">
         <item>Acciughe</item>
         <item>Aceto</item>

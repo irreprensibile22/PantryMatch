@@ -20,34 +20,24 @@ class PantryViewModel(
     private val productLookup: ProductLookupRepository = ProductLookupRepository(),
 ) : ViewModel() {
 
-    /** Esito della risoluzione di un codice a barre in un prodotto. */
+    // esito della scansione barcode, consumato una sola volta dalla UI (vedi _scanResult)
     sealed interface ScanResult {
-        /**
-         * Prodotto riconosciuto.
-         *
-         * @param name   valore da pre-compilare nel campo nome (la categoria se
-         *               disponibile, altrimenti il nome commerciale).
-         * @param helper testo di aiuto sotto il campo (di norma il nome
-         *               commerciale), oppure null se non c'è nulla da mostrare.
-         */
+        // name = testo da pre-compilare nel campo, helper = nome commerciale mostrato sotto
         data class Found(val name: String, val helper: String?) : ScanResult
-        /** Codice letto ma non presente nel database Open Food Facts. */
         data class NotFound(val barcode: String) : ScanResult
-        /** Errore di rete durante il lookup. */
         data object Error : ScanResult
     }
 
     private val _items = MutableStateFlow<Resource<List<PantryItem>>>(Resource.Loading)
     val items: StateFlow<Resource<List<PantryItem>>> = _items.asStateFlow()
 
-    /** Stato di caricamento del lookup prodotto (per mostrare un indicatore). */
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
+    // evento one-shot: SharedFlow invece di StateFlow per non riemettere l'esito dopo una rotazione
     private val _scanResult = MutableSharedFlow<ScanResult>(extraBufferCapacity = 1)
     val scanResult: SharedFlow<ScanResult> = _scanResult.asSharedFlow()
 
-    /** Risolve il codice a barre scansionato nelle info del prodotto. */
     fun lookupBarcode(barcode: String) {
         _scanning.value = true
         viewModelScope.launch {
@@ -61,13 +51,9 @@ class PantryViewModel(
         }
     }
 
-    /**
-     * Preferisce la **categoria** come nome (più vicina a un ingrediente per il
-     * matching) e mostra il nome commerciale come aiuto. Se manca la categoria,
-     * usa il nome commerciale nel campo. Se manca tutto, è un NotFound.
-     */
     private fun ProductLookupRepository.ProductInfo?.toScanResult(barcode: String): ScanResult {
         if (this == null) return ScanResult.NotFound(barcode)
+        // preferisco la categoria: e piu vicina a un ingrediente utile al matching che non il nome commerciale
         return when {
             category != null -> ScanResult.Found(
                 name = IngredientMatcher.normalize(category),

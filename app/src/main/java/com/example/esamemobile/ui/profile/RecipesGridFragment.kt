@@ -20,7 +20,7 @@ import com.example.esamemobile.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/** Griglia con tutte le ricette dell'utente + ricerca testuale ("Vedi tutte"). */
+// Griglia "Vedi tutte" a 2 colonne; l'argomento mode decide se mostrare le mie ricette o i salvati.
 class RecipesGridFragment : Fragment() {
 
     private var _binding: FragmentRecipesGridBinding? = null

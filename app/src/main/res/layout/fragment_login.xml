@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Login in stile editoriale "Tavola": fondo crema, logo + titolo serif, campi
-     OutlinedBox in card, pulsante accentato. -->
+<!-- Schermata di login (email/password + Google), stile "Tavola". -->
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -95,7 +95,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Separatore "oppure" -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

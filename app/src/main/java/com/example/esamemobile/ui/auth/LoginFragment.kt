@@ -21,17 +21,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
+// Schermata di login: email/password + accesso con Google.
 class LoginFragment : Fragment() {
 
+    // pattern ViewBinding: azzero _binding in onDestroyView per non trattenere le view
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: AuthViewModel by viewModels()
 
-    /**
-     * Riceve il risultato del flusso Google e converte l'idToken in credenziale
-     * Firebase. Registrato come membro per essere pronto prima dello stato STARTED.
-     */
     private val googleLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -82,12 +80,8 @@ class LoginFragment : Fragment() {
         }
     }
 
-    /**
-     * Configura Google Sign-In solo se `default_web_client_id` è disponibile
-     * (generato da `google-services.json`). Senza Firebase il pulsante si
-     * nasconde, così l'app resta compilabile e avviabile.
-     */
     private fun setupGoogleSignIn() {
+        // default_web_client_id lo genera il plugin google-services: se manca, nascondo il pulsante Google
         val resId = resources.getIdentifier(
             "default_web_client_id", "string", requireContext().packageName
         )
@@ -101,7 +95,7 @@ class LoginFragment : Fragment() {
             .build()
         val client = GoogleSignIn.getClient(requireContext(), options)
         binding.buttonGoogle.setOnClickListener {
-            // signOut prima del launch così l'utente può scegliere l'account ogni volta
+            // signOut prima del launch cosi mostra sempre il selettore account, non riusa l'ultimo
             client.signOut().addOnCompleteListener {
                 googleLauncher.launch(client.signInIntent)
             }

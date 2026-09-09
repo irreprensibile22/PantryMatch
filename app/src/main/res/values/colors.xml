@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Palette Material 3 — tema chiaro "Tavola" (caldo, crema/terracotta) -->
+    <!-- Token Material 3 (light) ritarati sulla palette calda "Tavola": mappati sugli attributi del tema. -->
     <color name="md_primary">#C8552B</color>
     <color name="md_on_primary">#FFFFFF</color>
     <color name="md_primary_container">#F7E4D4</color>
@@ -37,7 +37,7 @@
     <color name="md_outline">#9A8A7B</color>
     <color name="md_outline_variant">#DDCBB9</color>
 
-    <!-- Palette "Tavola" — feed editoriale della Home (vedi Tavola_Home_A.html) -->
+    <!-- Colori "Tavola" usati direttamente nei layout (crema/terracotta) oltre ai token del tema. -->
     <color name="tavola_bg">#F4ECE0</color>
     <color name="tavola_header">#F7E4D4</color>
     <color name="tavola_accent">#C8552B</color>
@@ -60,6 +60,5 @@
     <color name="tavola_icon_stroke">#7A6757</color>
     <color name="tavola_label">#A8937F</color>
 
-    <!-- Splash screen: sfondo crema della palette Tavola -->
     <color name="splash_background">#F4ECE0</color>
 </resources>

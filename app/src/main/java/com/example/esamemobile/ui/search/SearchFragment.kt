@@ -23,6 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
+// Home dell'app: feed della community con dialog Filtri (disponibilita + categoria).
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
@@ -44,7 +45,6 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerResults.adapter = adapter
 
-        // Avatar header: iniziale dell'utente loggato (fallback "?").
         val name = runCatching { AuthRepository().currentUser?.displayName }.getOrNull()
         binding.textProfileInitial.text =
             name?.trim()?.firstOrNull()?.uppercase() ?: "?"
@@ -66,18 +66,13 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Riallinea i cuori se i preferiti sono cambiati altrove (es. dal dettaglio).
+        // rileggo i preferiti al rientro: potrei averli cambiati dal dettaglio
         viewModel.loadFavorites()
     }
 
-    /**
-     * Dialog "Filtri" raggruppato in sezioni: Disponibilità (ingredienti
-     * mancanti) e Categoria (Primo, Secondo, Dolce, …).
-     */
     private fun showFilterDialog() {
         val dialogBinding = DialogFiltersBinding.inflate(layoutInflater)
 
-        // Disponibilità: ripristina la selezione corrente.
         dialogBinding.chipGroupAvailability.check(
             when (viewModel.maxMissing) {
                 0 -> dialogBinding.chipAvailabilityReady.id
@@ -87,7 +82,7 @@ class SearchFragment : Fragment() {
             }
         )
 
-        // Categoria: chip "Tutte" + una per ogni categoria (caricate da risorse).
+        // primo chip "Tutte" (senza tag), poi un chip per categoria; il tag distingue i chip filtrabili
         val categories = resources.getStringArray(R.array.recipe_categories)
         addCategoryChip(dialogBinding, getString(R.string.filter_all), isAll = true)
         categories.forEach { addCategoryChip(dialogBinding, it, isAll = false) }

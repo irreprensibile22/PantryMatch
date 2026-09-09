@@ -9,8 +9,10 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+// Test unitari del cuore funzionale: normalizzazione, mancanti, opzionali, ordinamento e filtro.
 class IngredientMatcherTest {
 
+    // piccoli helper per costruire dispensa e ricette senza ripetere i costruttori nei test
     private fun pantry(vararg names: String) =
         names.map { PantryItem(name = it) }
 
@@ -63,7 +65,6 @@ class IngredientMatcherTest {
             "Torta",
             ingredients = listOf(ing("Farina"), ing("Zucchero"), ing("Uova"), ing("Burro")),
         )
-        // In dispensa solo farina -> mancano 3 ingredienti
         val conLimite2 = IngredientMatcher.match(pantry("farina"), listOf(r), maxMissing = 2)
         assertTrue(conLimite2.isEmpty())
 
@@ -83,7 +84,6 @@ class IngredientMatcherTest {
             recipes = listOf(pronta, unoMancante, veloce),
             maxMissing = 2,
         )
-        // Prima le preparabili (0 mancanti), tra queste prima la più veloce
         assertEquals("Veloce", result[0].recipe.title)
         assertEquals("Pronta", result[1].recipe.title)
         assertEquals("UnoMancante", result[2].recipe.title)

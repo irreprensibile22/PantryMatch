@@ -11,18 +11,14 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.RecipeMatch
 import com.example.esamemobile.databinding.ItemRecipeMatchBinding
 
-/**
- * Feed a schede verticali (stile Instagram): foto a tutta larghezza, avatar
- * dell'autore e cuore "salva nei preferiti" in overlay sulla foto per il
- * salvataggio rapido senza aprire il dettaglio.
- */
+// Schede grandi del feed Home (foto, badge preparabile/mancanti, cuore preferiti).
 class RecipeMatchAdapter(
     private val onClick: (RecipeMatch) -> Unit,
     private val onToggleFavorite: (RecipeMatch, Boolean) -> Unit = { _, _ -> },
 ) : ListAdapter<RecipeMatch, RecipeMatchAdapter.VH>(DIFF) {
 
-    /** Id delle ricette nei preferiti: determina cuore pieno/vuoto. */
     var favoriteIds: Set<String> = emptySet()
+        // il cambio dei preferiti tocca solo l'icona cuore: ridisegno tutto senza calcolare un diff
         @SuppressLint("NotifyDataSetChanged")
         set(value) {
             field = value
@@ -38,6 +34,7 @@ class RecipeMatchAdapter(
                 match.recipe.authorName.trim().firstOrNull()?.uppercase() ?: "?"
             binding.textTime.text = ctx.getString(R.string.prep_time_format, match.recipe.prepTimeMin)
 
+            // badge verde se preparabile subito, altrimenti terracotta con il numero di mancanti
             if (match.isReady) {
                 binding.textBadge.text = ctx.getString(R.string.badge_ready)
                 binding.textBadge.setBackgroundResource(R.drawable.bg_badge_ready)

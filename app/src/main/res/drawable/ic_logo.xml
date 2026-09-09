@@ -1,23 +1,16 @@
-<!--
-  Logo PantryMatch / "Tavola": una pentola (cuore della cucina) con coperchio,
-  manici e vapore, segnata da un check = il "match" tra dispensa e ricette
-  preparabili. Tinte della palette Tavola (terracotta su crema). Contenuto
-  centrato con margine per stare nel cerchio dello splash (240dp).
--->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="120dp"
     android:height="120dp"
     android:viewportWidth="120"
     android:viewportHeight="120">
 
-  <!-- Scala il contenuto nella zona "sicura" (~2/3 centrali) del cerchio splash. -->
   <group
       android:scaleX="0.74"
       android:scaleY="0.74"
       android:pivotX="60"
       android:pivotY="62">
 
-    <!-- Vapore: due volute sopra il coperchio -->
     <path
         android:pathData="M50,32 q-5,-6 0,-12 q5,-6 0,-12"
         android:strokeColor="#90785F"
@@ -31,7 +24,6 @@
         android:strokeLineCap="round"
         android:fillColor="#00000000" />
 
-    <!-- Manici della pentola -->
     <path
         android:pathData="M34,62 q-10,0 -10,9 q0,9 10,9"
         android:strokeColor="#8C4A30"
@@ -45,22 +37,18 @@
         android:strokeLineCap="round"
         android:fillColor="#00000000" />
 
-    <!-- Corpo della pentola -->
     <path
         android:fillColor="#C8552B"
         android:pathData="M30,56 L90,56 L85,90 Q84,96 78,96 L42,96 Q36,96 35,90 Z" />
 
-    <!-- Coperchio -->
     <path
         android:fillColor="#8C4A30"
         android:pathData="M26,48 L94,48 Q97,48 97,51.5 Q97,57 91,57 L29,57 Q23,57 23,51.5 Q23,48 26,48 Z" />
 
-    <!-- Pomello del coperchio -->
     <path
         android:fillColor="#8C4A30"
         android:pathData="M60,38 m-5,0 a5,5 0 1 0 10,0 a5,5 0 1 0 -10,0 Z" />
 
-    <!-- Check "preparabile": il match dispensa ↔ ricetta -->
     <path
         android:pathData="M45,75 L55,85 L77,66"
         android:strokeColor="#F7E4D4"

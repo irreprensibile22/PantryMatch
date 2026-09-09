@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Stili condivisi del look "Tavola" (Profilo) -->
+    <!-- Stili "Tavola" riusati in piu schermate (card, etichette sezione, pillole meta) per non ripetere gli attributi. -->
 
     <style name="TavolaStatCard" parent="Widget.Material3.CardView.Elevated">
         <item name="android:layout_width">0dp</item>
@@ -58,7 +58,6 @@
         <item name="android:background">?attr/colorOutlineVariant</item>
     </style>
 
-    <!-- Editor ricetta (stile "Tavola"): etichetta di sezione serif + card morbida -->
     <style name="TavolaEditorSection">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -70,7 +69,6 @@
         <item name="android:textColor">@color/tavola_ink</item>
     </style>
 
-    <!-- Pillola meta del dettaglio ricetta (categoria / tempo / difficoltà) -->
     <style name="TavolaMetaPill">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

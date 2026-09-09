@@ -8,21 +8,14 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
-/**
- * Pianifica (e annulla) il task periodico [PantryMatchWorker] tramite WorkManager.
- */
+// Pianifica/annulla il worker periodico con WorkManager.
 object PantryMatchScheduler {
 
     private const val WORK_NAME = "pantry_match_periodic"
-    // Intervallo del controllo periodico (minimo consentito da WorkManager: 15 min).
     private const val INTERVAL_MINUTES = 30L
 
-    /**
-     * Registra il controllo periodico. Usa una "unique work" con policy KEEP così
-     * da non duplicare il lavoro a ogni avvio dell'app: se è già pianificato non
-     * viene riprogrammato.
-     */
     fun schedule(context: Context) {
+        // il worker fa chiamate di rete: lo eseguo solo quando c'e connessione
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -31,6 +24,7 @@ object PantryMatchScheduler {
             .setConstraints(constraints)
             .build()
 
+        // KEEP: se e gia pianificato non lo ricreo (evito doppioni ad ogni avvio)
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,

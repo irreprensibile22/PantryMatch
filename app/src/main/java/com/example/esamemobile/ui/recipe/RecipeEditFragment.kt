@@ -28,10 +28,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-/**
- * Creazione o modifica di una ricetta. Se riceve [ARG_RECIPE_ID] entra in
- * modalità modifica e pre-compila il form con la ricetta esistente.
- */
+// Editor per creare o modificare una ricetta (recipeId vuoto = nuova).
 class RecipeEditFragment : Fragment() {
 
     private var _binding: FragmentRecipeEditBinding? = null
@@ -42,11 +39,10 @@ class RecipeEditFragment : Fragment() {
     private val recipeId: String
         get() = arguments?.getString(ARG_RECIPE_ID).orEmpty()
 
-    /** Ricetta esistente in modifica (per conservare id, imageUrl e createdAt). */
     private var editing: Recipe? = null
-    private var pickedImage: Uri? = null
+    private var pickedImage: Uri? = null // foto scelta ma non ancora caricata
 
-    /** Ingredienti aggiunti, gestiti come lista strutturata (chip rimovibili). */
+    // ingredienti tenuti in memoria e ridisegnati come chip: al salvataggio finiscono nella ricetta
     private val ingredients = mutableListOf<RecipeIngredient>()
 
     private val imagePicker = registerForActivityResult(
@@ -115,6 +111,7 @@ class RecipeEditFragment : Fragment() {
     }
 
     private fun save() {
+        // minimo indispensabile: titolo e almeno un ingrediente
         val title = binding.editTitle.text?.toString().orEmpty().trim()
         if (title.isEmpty() || ingredients.isEmpty()) {
             Snackbar.make(binding.root, getString(R.string.recipe_invalid), Snackbar.LENGTH_LONG).show()
@@ -125,6 +122,7 @@ class RecipeEditFragment : Fragment() {
             binding.chipHard.id -> Difficulty.HARD
             else -> Difficulty.EASY
         }
+        // parto dalla ricetta esistente (per conservare id/autore) o da una nuova
         val base = editing ?: Recipe()
         val recipe = base.copy(
             title = title,
@@ -139,7 +137,6 @@ class RecipeEditFragment : Fragment() {
         viewModel.save(recipe, pickedImage)
     }
 
-    /** Ridisegna i chip degli ingredienti aggiunti (tap = modifica, X = rimuovi). */
     private fun renderIngredients() {
         binding.chipGroupIngredients.removeAllViews()
         ingredients.forEachIndexed { index, ing ->
@@ -164,11 +161,7 @@ class RecipeEditFragment : Fragment() {
         return if (tail.isBlank()) ing.name else "${ing.name} $tail"
     }
 
-    /**
-     * Dialog condiviso (stesso della Dispensa) per aggiungere un ingrediente
-     * ([editIndex] null) o modificarne uno esistente. Il nome usa il catalogo a
-     * tendina (`ingredient_catalog`) per uniformare gli ingredienti.
-     */
+    // stesso dialog della Dispensa: editIndex != null = sto modificando un ingrediente gia in lista
     private fun showIngredientDialog(editIndex: Int? = null) {
         val dialogBinding = DialogAddIngredientBinding.inflate(layoutInflater)
         val noUnit = getString(R.string.unit_none)

@@ -23,6 +23,7 @@ import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.coroutines.launch
 
+// Schermata Dispensa: lista ingredienti, aggiunta manuale e inserimento tramite scansione barcode.
 class PantryFragment : Fragment() {
 
     private var _binding: FragmentPantryBinding? = null
@@ -68,7 +69,7 @@ class PantryFragment : Fragment() {
         viewModel.load()
     }
 
-    /** Avvia la scansione tramite il Google code scanner (nessun permesso CAMERA). */
+    // scanner di Google Play Services: gira in un processo separato, quindi non serve il permesso CAMERA
     private fun startScan() {
         val options = GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(
@@ -84,13 +85,12 @@ class PantryFragment : Fragment() {
             .addOnSuccessListener { barcode ->
                 barcode.rawValue?.takeIf { it.isNotBlank() }?.let { viewModel.lookupBarcode(it) }
             }
-            .addOnCanceledListener { /* scansione annullata dall'utente */ }
+            .addOnCanceledListener {  }
             .addOnFailureListener {
                 Snackbar.make(binding.root, R.string.scan_error, Snackbar.LENGTH_LONG).show()
             }
     }
 
-    /** Risultato del lookup del prodotto: apre il dialog pre-compilato o avvisa. */
     private fun onScanResult(result: PantryViewModel.ScanResult) {
         when (result) {
             is PantryViewModel.ScanResult.Found ->
@@ -127,18 +127,14 @@ class PantryFragment : Fragment() {
         }
     }
 
-    /**
-     * Dialog condiviso per aggiungere un nuovo ingrediente ([existing] null) o
-     * modificarne uno esistente (campi pre-compilati).
-     */
     private fun showItemDialog(
         existing: PantryItem? = null,
         prefillName: String? = null,
         prefillHelper: String? = null,
     ) {
+        // stesso dialog per aggiunta e modifica: se existing != null e in modalita modifica
         val dialogBinding = DialogAddIngredientBinding.inflate(layoutInflater)
 
-        // Unità: menu a tendina con valori predefiniti (non digitabile).
         val noUnit = getString(R.string.unit_none)
         dialogBinding.editUnit.setAdapter(
             ArrayAdapter(
@@ -147,16 +143,12 @@ class PantryFragment : Fragment() {
                 resources.getStringArray(R.array.pantry_units),
             )
         )
-        // Selezione iniziale: unità esistente oppure "(nessuna)".
         dialogBinding.editUnit.setText(existing?.unit?.takeIf { it.isNotBlank() } ?: noUnit, false)
 
         existing?.let {
-            // setText(.., false) per non far comparire il dropdown di suggerimenti
-            // durante il pre-riempimento in modifica.
             dialogBinding.editName.setText(it.name.replaceFirstChar { c -> c.uppercase() }, false)
             dialogBinding.editQuantity.setText(it.quantity?.let(::trimNumber).orEmpty())
         }
-        // Nome pre-compilato dal codice a barre (solo in aggiunta, non in modifica).
         if (existing == null && !prefillName.isNullOrBlank()) {
             dialogBinding.editName.setText(prefillName, false)
             if (!prefillHelper.isNullOrBlank()) {
@@ -170,6 +162,7 @@ class PantryFragment : Fragment() {
             .setPositiveButton(if (isEdit) "Salva" else "Aggiungi") { _, _ ->
                 val name = dialogBinding.editName.text?.toString().orEmpty()
                 val quantity = dialogBinding.editQuantity.text?.toString()?.toDoubleOrNull()
+                // "nessuna" equivale ad assenza di unita
                 val unit = dialogBinding.editUnit.text?.toString()
                     ?.takeIf { it.isNotBlank() && it != noUnit }
                 if (existing != null) {

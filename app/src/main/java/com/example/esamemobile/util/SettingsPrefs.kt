@@ -2,11 +2,12 @@ package com.example.esamemobile.util
 
 import android.content.Context
 
-/** Preferenze locali dell'app (es. abilitazione notifiche dispensa). */
+// Preferenze locali dell'utente (SharedPreferences).
 object SettingsPrefs {
     private const val PREFS = "settings"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
 
+    // di default le notifiche sono attive
     fun notificationsEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getBoolean(KEY_NOTIFICATIONS, true)

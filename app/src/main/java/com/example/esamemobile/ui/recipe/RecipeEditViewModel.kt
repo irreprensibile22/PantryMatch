@@ -11,16 +11,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * Gestisce creazione e modifica di una ricetta. In modifica carica la ricetta
- * esistente per pre-compilare il form; al salvataggio carica prima l'eventuale
- * immagine su Storage e poi scrive il documento.
- */
+// Crea/modifica ricetta: carica l'esistente (se in modifica) e gestisce salvataggio + upload foto.
 class RecipeEditViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
 ) : ViewModel() {
 
-    // null finché non si modifica una ricetta esistente
     private val _loaded = MutableStateFlow<Resource<Recipe>?>(null)
     val loaded: StateFlow<Resource<Recipe>?> = _loaded.asStateFlow()
 
@@ -44,9 +39,7 @@ class RecipeEditViewModel(
     fun save(recipe: Recipe, imageUri: Uri?) {
         _saveState.value = Resource.Loading
         viewModelScope.launch {
-            // L'upload dell'immagine è tentato a parte: se lo Storage non è
-            // disponibile (es. progetto su piano Spark) si prosegue salvando la
-            // ricetta senza foto, segnalandolo all'utente, invece di fallire.
+            // se Storage non e attivo (piano Spark) l'upload fallisce: salvo comunque la ricetta senza foto
             var photoSkipped = false
             val toSave = if (imageUri != null) {
                 runCatching { repository.uploadImage(imageUri) }.fold(
@@ -64,9 +57,5 @@ class RecipeEditViewModel(
         }
     }
 
-    /**
-     * Esito di un salvataggio: id della ricetta e se la foto è stata saltata
-     * perché l'upload su Storage non è andato a buon fine.
-     */
     data class SaveOutcome(val id: String, val photoSkipped: Boolean)
 }

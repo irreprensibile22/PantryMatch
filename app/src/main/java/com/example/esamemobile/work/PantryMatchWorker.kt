@@ -18,33 +18,24 @@ import com.example.esamemobile.data.repository.PantryRepository
 import com.example.esamemobile.data.repository.RecipeRepository
 import com.example.esamemobile.util.Notifications
 
-/**
- * Task periodico (WorkManager): confronta la dispensa dell'utente con le ricette
- * pubbliche e, se ce n'è almeno una preparabile **subito** (0 ingredienti
- * mancanti), mostra una notifica locale "Con la tua dispensa puoi preparare N
- * ricette".
- *
- * È un [CoroutineWorker] così da poter chiamare direttamente i repository
- * sospesi (Firebase via coroutine). Tutte le chiamate sono protette: senza
- * utente loggato o senza Firebase configurato il worker termina senza errori.
- */
+// Lavoro periodico in background: conta le ricette preparabili con la dispensa e notifica l'utente.
 class PantryMatchWorker(
     context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        // Senza utente autenticato non c'è una dispensa da confrontare.
+        // se nessuno e loggato non c'e niente da fare (ma non e un errore)
         val loggedIn = runCatching { AuthRepository().isLoggedIn }.getOrDefault(false)
         if (!loggedIn) return Result.success()
 
         val count = runCatching {
             val pantry = PantryRepository().getPantry()
+            // maxMissing = 0: solo le ricette preparabili subito, senza ingredienti mancanti
             if (pantry.isEmpty()) 0
             else RecipeRepository().searchByPantry(pantry, maxMissing = 0).size
         }.getOrElse {
-            // Errore transitorio (rete/Firestore): riprova più tardi.
-            return Result.retry()
+            return Result.retry() // errore di rete/Firestore: riprovo piu tardi
         }
 
         if (count > 0) notifyPreparable(count)
@@ -54,8 +45,7 @@ class PantryMatchWorker(
     private fun notifyPreparable(count: Int) {
         Notifications.ensureChannel(applicationContext)
 
-        // Su Android 13+ la notifica richiede il permesso runtime: se manca,
-        // non possiamo notificare (l'utente lo concede dalla MainActivity).
+        // su Android 13+ senza il permesso runtime la notifica verrebbe scartata: esco prima
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(
                 applicationContext, Manifest.permission.POST_NOTIFICATIONS,

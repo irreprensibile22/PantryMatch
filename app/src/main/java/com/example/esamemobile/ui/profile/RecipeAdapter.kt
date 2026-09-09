@@ -11,11 +11,7 @@ import com.example.esamemobile.R
 import com.example.esamemobile.data.model.Recipe
 import com.example.esamemobile.databinding.ItemRecipeBinding
 
-/**
- * "Le mie ricette" nel Ricettario: card a tutta larghezza in stile feed con foto,
- * badge stato (Pubblica/Privata), tempo, numero ingredienti e azioni
- * modifica/elimina.
- */
+// "Le mie ricette" nel Ricettario: card a tutta larghezza con badge Pubblica/Privata e azioni.
 class RecipeAdapter(
     private val onClick: (Recipe) -> Unit,
     private val onEdit: (Recipe) -> Unit,

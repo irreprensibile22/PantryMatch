@@ -11,10 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+// ViewModel condiviso da login e registrazione: espone l'esito come Resource alla UI.
 class AuthViewModel(
     private val repository: AuthRepository = AuthRepository(),
 ) : ViewModel() {
 
+    // null = nessuna operazione in corso; la UI osserva questo stato
     private val _state = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val state: StateFlow<Resource<FirebaseUser>?> = _state.asStateFlow()
 
@@ -31,7 +33,6 @@ class AuthViewModel(
         }
     }
 
-    /** Login con credenziale Google ottenuta dal flusso Sign-In. */
     fun loginWithGoogle(credential: AuthCredential) {
         _state.value = Resource.Loading
         viewModelScope.launch {

@@ -5,11 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 
-/**
- * Gestisce le ricette preferite dell'utente corrente (sub-collection
- * `users/{uid}/favorites`). Ogni preferito è un documento con id uguale
- * all'id della ricetta, così il toggle è una semplice set/delete.
- */
+// Preferiti dell'utente: un documento per ricetta salvata in users/{uid}/favorites (l'id doc = id ricetta).
 class FavoritesRepository {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -20,14 +16,13 @@ class FavoritesRepository {
     suspend fun isFavorite(recipeId: String): Boolean =
         favoritesCollection().document(recipeId).get().await().exists()
 
-    /** Id delle ricette salvate nei preferiti, dalla più recente. */
+    // dai piu recenti ai piu vecchi (campo addedAt salvato al momento del salvataggio)
     suspend fun getFavoriteIds(): List<String> =
         favoritesCollection()
             .orderBy("addedAt", Query.Direction.DESCENDING)
             .get().await()
             .documents.map { it.id }
 
-    /** Aggiunge ([favorite] = true) o rimuove il preferito per [recipeId]. */
     suspend fun setFavorite(recipeId: String, favorite: Boolean) {
         val doc = favoritesCollection().document(recipeId)
         if (favorite) {
