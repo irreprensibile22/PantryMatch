@@ -1,18 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
-    // google-services richiede app/google-services.json per compilare: commentare questa riga per build senza Firebase
+    // google-services needs app/google-services.json to compile: comment out this line to build without Firebase
     alias(libs.plugins.google.services)
 }
 
 android {
-    namespace = "com.example.esamemobile"
+    namespace = "com.example.pantrymatch"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.esamemobile"
-        minSdk = 24 // Android 7.0: copre la maggior parte dei dispositivi
+        applicationId = "com.example.pantrymatch"
+        minSdk = 24 // Android 7.0: covers most devices
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
@@ -32,7 +32,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
-        viewBinding = true // usato in tutti i Fragment/Activity al posto di findViewById
+        viewBinding = true // used in every Fragment/Activity instead of findViewById
     }
 }
 
@@ -59,7 +59,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
 
-    // il BoM allinea le versioni delle librerie Firebase tra loro
+    // the BoM keeps Firebase library versions aligned
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)

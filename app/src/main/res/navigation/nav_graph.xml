@@ -5,17 +5,17 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/searchFragment">
 
-    <!-- Grafo di navigazione unico: start = Home (searchFragment); login/registrazione svuotano il back stack. -->
+    <!-- Single navigation graph: start = Home (searchFragment); login/registration clear the back stack. -->
 
     <fragment
         android:id="@+id/pantryFragment"
-        android:name="com.example.esamemobile.ui.pantry.PantryFragment"
+        android:name="com.example.pantrymatch.ui.pantry.PantryFragment"
         android:label="@string/nav_pantry"
         tools:layout="@layout/fragment_pantry" />
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.esamemobile.ui.search.SearchFragment"
+        android:name="com.example.pantrymatch.ui.search.SearchFragment"
         android:label="@string/nav_home"
         tools:layout="@layout/fragment_search">
         <action
@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/friendsFragment"
-        android:name="com.example.esamemobile.ui.friends.FriendsFragment"
+        android:name="com.example.pantrymatch.ui.friends.FriendsFragment"
         android:label="@string/nav_friends"
         tools:layout="@layout/fragment_friends">
         <action
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/friendRecipesFragment"
-        android:name="com.example.esamemobile.ui.friends.FriendRecipesFragment"
+        android:name="com.example.pantrymatch.ui.friends.FriendRecipesFragment"
         android:label="@string/nav_friend_recipes"
         tools:layout="@layout/fragment_friend_recipes">
         <argument
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.esamemobile.ui.profile.ProfileFragment"
+        android:name="com.example.pantrymatch.ui.profile.ProfileFragment"
         android:label="@string/nav_profile"
         tools:layout="@layout/fragment_profile">
         <action
@@ -64,7 +64,7 @@
 
     <fragment
         android:id="@+id/recipeBookFragment"
-        android:name="com.example.esamemobile.ui.recipebook.RecipeBookFragment"
+        android:name="com.example.pantrymatch.ui.recipebook.RecipeBookFragment"
         android:label="@string/nav_recipe_book"
         tools:layout="@layout/fragment_recipebook">
         <action
@@ -80,7 +80,7 @@
 
     <fragment
         android:id="@+id/recipesGridFragment"
-        android:name="com.example.esamemobile.ui.profile.RecipesGridFragment"
+        android:name="com.example.pantrymatch.ui.profile.RecipesGridFragment"
         android:label="@string/profile_my_recipes"
         tools:layout="@layout/fragment_recipes_grid">
         <argument
@@ -94,7 +94,7 @@
 
     <fragment
         android:id="@+id/recipeDetailFragment"
-        android:name="com.example.esamemobile.ui.recipe.RecipeDetailFragment"
+        android:name="com.example.pantrymatch.ui.recipe.RecipeDetailFragment"
         android:label="@string/nav_recipe"
         tools:layout="@layout/fragment_recipe_detail">
         <argument
@@ -107,7 +107,7 @@
 
     <fragment
         android:id="@+id/recipeEditFragment"
-        android:name="com.example.esamemobile.ui.recipe.RecipeEditFragment"
+        android:name="com.example.pantrymatch.ui.recipe.RecipeEditFragment"
         android:label="@string/nav_recipe_edit"
         tools:layout="@layout/fragment_recipe_edit">
         <argument
@@ -118,10 +118,10 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.esamemobile.ui.auth.LoginFragment"
+        android:name="com.example.pantrymatch.ui.auth.LoginFragment"
         android:label="@string/login"
         tools:layout="@layout/fragment_login">
-        <!-- dopo il login vado alla Home rimuovendo il login dal back stack (niente ritorno con back) -->
+        <!-- after login go to Home, removing login from the back stack (no going back) -->
         <action
             android:id="@+id/action_login_to_pantry"
             app:destination="@id/searchFragment"
@@ -134,7 +134,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.esamemobile.ui.auth.RegisterFragment"
+        android:name="com.example.pantrymatch.ui.auth.RegisterFragment"
         android:label="@string/register_title"
         tools:layout="@layout/fragment_register">
         <action

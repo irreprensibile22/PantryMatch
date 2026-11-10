@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Regole di backup/trasferimento (Android 12+): nessuna regola specifica, si usa il comportamento di default. -->
+<!-- Backup/transfer rules (Android 12+): no specific rules, default behavior is used. -->
 <data-extraction-rules>
     <cloud-backup>
 

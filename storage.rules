@@ -1,11 +1,11 @@
 rules_version = '2';
 
-// Security rules per Firebase Storage (immagini delle ricette).
-// Le immagini sono salvate in `recipe_images/{uid}/{file}.jpg`:
-//  - lettura: consentita a tutti gli utenti autenticati (servono per mostrare
-//    le ricette pubbliche della community tramite Glide);
-//  - scrittura: solo il proprietario della cartella `{uid}`, con vincoli su
-//    dimensione massima e tipo di file (solo immagini).
+// Security rules for Firebase Storage (recipe images).
+// Images are stored at `recipe_images/{uid}/{file}.jpg`:
+//  - read: allowed for all authenticated users (needed to show
+//    public community recipes via Glide);
+//  - write: only the owner of the `{uid}` folder, with limits on
+//    maximum size and file type (images only).
 service firebase.storage {
   match /b/{bucket}/o {
 

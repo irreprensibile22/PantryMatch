@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Editor crea/modifica ricetta, con foto in card e sezioni serif. -->
+<!-- Create/edit recipe editor, with photo card and serif sections. -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

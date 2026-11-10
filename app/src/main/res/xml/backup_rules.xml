@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Regole di backup (Android <12): vuote, nessun dato locale sensibile da includere/escludere. -->
+<!-- Backup rules (Android <12): empty, no sensitive local data to include/exclude. -->
 <full-backup-content>
 
 </full-backup-content>

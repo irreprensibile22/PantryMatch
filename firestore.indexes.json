@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "//": "getMyRecipes(): ricette dell'autore ordinate per data decrescente.",
+      "//": "getMyRecipes(): the author's recipes sorted by date, newest first.",
       "collectionGroup": "recipes",
       "queryScope": "COLLECTION",
       "fields": [
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "//": "searchByPantry(): ricette pubbliche pre-filtrate per ingrediente.",
+      "//": "searchByPantry(): public recipes pre-filtered by ingredient.",
       "collectionGroup": "recipes",
       "queryScope": "COLLECTION",
       "fields": [

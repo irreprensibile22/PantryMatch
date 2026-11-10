@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Profilo: hero utente, statistiche, sezioni Account/Preferenze e logout. -->
+<!-- Profile: user hero, stats, Account/Preferences sections and logout. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

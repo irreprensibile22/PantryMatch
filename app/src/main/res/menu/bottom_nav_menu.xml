@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Le 5 sezioni della bottom bar; gli id combaciano con le destinazioni top-level del nav graph. -->
+<!-- The 5 bottom bar sections; ids match the nav graph's top-level destinations. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item

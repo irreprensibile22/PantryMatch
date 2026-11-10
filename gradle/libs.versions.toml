@@ -8,7 +8,7 @@ appcompat = "1.7.1"
 material = "1.14.0"
 activityKtx = "1.13.0"
 constraintlayout = "2.2.1"
-# --- aggiunte per PantryMatch ---
+# --- added for PantryMatch ---
 fragmentKtx = "1.8.5"
 lifecycle = "2.9.0"
 navigation = "2.9.0"
@@ -46,12 +46,12 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
 
-# --- Coroutine ---
+# --- Coroutines ---
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
-# --- Firebase (la BoM allinea le versioni) ---
+# --- Firebase (the BoM aligns versions) ---
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }

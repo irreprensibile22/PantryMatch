@@ -3,7 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Token Material 3 (light) ritarati sulla palette calda "Tavola": mappati sugli attributi del tema. -->
+    <!-- Material 3 (light) tokens retuned to the warm "Tavola" palette: mapped to theme attributes. -->
     <color name="md_primary">#C8552B</color>
     <color name="md_on_primary">#FFFFFF</color>
     <color name="md_primary_container">#F7E4D4</color>
@@ -37,7 +37,7 @@
     <color name="md_outline">#9A8A7B</color>
     <color name="md_outline_variant">#DDCBB9</color>
 
-    <!-- Colori "Tavola" usati direttamente nei layout (crema/terracotta) oltre ai token del tema. -->
+    <!-- "Tavola" colors used directly in layouts (cream/terracotta) besides the theme tokens. -->
     <color name="tavola_bg">#F4ECE0</color>
     <color name="tavola_header">#F7E4D4</color>
     <color name="tavola_accent">#C8552B</color>

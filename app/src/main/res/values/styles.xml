@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Stili "Tavola" riusati in piu schermate (card, etichette sezione, pillole meta) per non ripetere gli attributi. -->
+    <!-- "Tavola" styles reused across screens (cards, section labels, meta pills) to avoid repeating attributes. -->
 
     <style name="TavolaStatCard" parent="Widget.Material3.CardView.Elevated">
         <item name="android:layout_width">0dp</item>

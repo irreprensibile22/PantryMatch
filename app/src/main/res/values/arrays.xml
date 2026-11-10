@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <!-- Catalogo condiviso di ingredienti (forme canoniche) suggerito nei menu a tendina di Dispensa
-         ed editor ricetta, per uniformare i nomi ed evitare doppioni. Coerente con IngredientMatcher. -->
+    <!-- Shared ingredient catalog (canonical forms) suggested in the Pantry and recipe editor
+         dropdowns, to keep names uniform and avoid duplicates. Consistent with IngredientMatcher. -->
     <string-array name="ingredient_catalog">
         <item>Acciughe</item>
         <item>Aceto</item>

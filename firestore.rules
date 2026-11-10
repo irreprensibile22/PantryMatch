@@ -1,8 +1,8 @@
 rules_version = '2';
 
-// Security rules per PantryMatch.
-// Principio: nessun accesso pubblico indiscriminato. Ogni utente gestisce solo
-// i propri dati; le ricette pubbliche sono leggibili dagli utenti autenticati.
+// Security rules for PantryMatch.
+// Principle: no unrestricted public access. Each user manages only their
+// own data; public recipes are readable by authenticated users.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -13,10 +13,10 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    // Profilo utente e relative sub-collection (pantry, friends, favorites):
-    // accessibili solo al proprietario.
+    // User profile and its sub-collections (pantry, friends, favorites):
+    // accessible only to the owner.
     match /users/{uid} {
-      allow read: if isSignedIn();          // i profili sono leggibili (es. autori/amici)
+      allow read: if isSignedIn();          // profiles are readable (e.g. authors/friends)
       allow write: if isOwner(uid);
 
       match /{document=**} {
@@ -24,7 +24,7 @@ service cloud.firestore {
       }
     }
 
-    // Ricette: lettura se pubbliche o se sei l'autore; scrittura solo da autore.
+    // Recipes: readable if public or if you are the author; writable only by the author.
     match /recipes/{recipeId} {
       allow read: if isSignedIn() &&
                      (resource.data.isPublic == true ||

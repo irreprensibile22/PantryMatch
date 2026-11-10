@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Tema base: mappa i token colore "Tavola" sugli attributi Material 3, cosi le view che usano
-         gli attributi del tema si adattano da sole. L'app e comunque forzata in chiaro da MainActivity. -->
-    <style name="Base.Theme.ESAMEMOBILE" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Base theme: maps the "Tavola" color tokens to Material 3 attributes, so views using
+         theme attributes adapt automatically. The app is forced to light mode by MainActivity anyway. -->
+    <style name="Base.Theme.PantryMatch" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_primary</item>
         <item name="colorOnPrimary">@color/md_on_primary</item>
         <item name="colorPrimaryContainer">@color/md_primary_container</item>
@@ -39,16 +39,16 @@
         <item name="colorOutlineVariant">@color/md_outline_variant</item>
     </style>
 
-    <style name="Theme.ESAMEMOBILE" parent="Base.Theme.ESAMEMOBILE" />
+    <style name="Theme.PantryMatch" parent="Base.Theme.PantryMatch" />
 
-    <!-- Tema di lancio (splash): dopo lo splash passa a Theme.ESAMEMOBILE via postSplashScreenTheme. -->
-    <style name="Theme.ESAMEMOBILE.Splash" parent="Theme.SplashScreen">
+    <!-- Launch (splash) theme: after the splash it switches to Theme.PantryMatch via postSplashScreenTheme. -->
+    <style name="Theme.PantryMatch.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo</item>
-        <item name="postSplashScreenTheme">@style/Theme.ESAMEMOBILE</item>
+        <item name="postSplashScreenTheme">@style/Theme.PantryMatch</item>
     </style>
 
-    <!-- indicatore della bottom bar azzerato: il look Tavola non usa la pillola sotto la voce attiva -->
+    <!-- bottom bar indicator removed: the Tavola look has no pill under the active item -->
     <style name="TavolaNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:width">0dp</item>
         <item name="android:height">0dp</item>

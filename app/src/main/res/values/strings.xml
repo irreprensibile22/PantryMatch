@@ -1,5 +1,5 @@
 <resources>
-    <!-- Tutte le stringhe UI (in italiano); i plurals gestiscono singolare/plurale di conteggi come ingredienti/ricette. -->
+    <!-- All UI strings (in Italian); plurals handle singular/plural for counts such as ingredients/recipes. -->
     <string name="app_name">PantryMatch</string>
 
     <string name="nav_home">Home</string>

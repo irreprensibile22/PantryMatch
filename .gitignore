@@ -13,7 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
-# Configurazione Firebase (ognuno la scarica dalla propria console)
+# Firebase config (each developer downloads their own from the Firebase console)
 google-services.json
 app/google-services.json
 
+
+# Local Claude Code settings (machine-specific hooks)
+.claude/

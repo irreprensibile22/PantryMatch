@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Dialog aggiungi/modifica ingrediente (nome dal catalogo, quantita, unita). -->
+<!-- Add/edit ingredient dialog (name from catalog, quantity, unit). -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
